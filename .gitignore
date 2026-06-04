@@ -30,6 +30,7 @@ build/
 # test artifacts
 playwright-report/
 test-results/
+.playwright-mcp/
 
 # typescript incremental build info
 *.tsbuildinfo
