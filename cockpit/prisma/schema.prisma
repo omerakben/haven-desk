@@ -161,5 +161,6 @@ model Settings {
   baseUrl      String?
   theme        String?  @default("system")
   captureToken String? // shared secret for the quick-capture endpoint
+  owuiApiKey   String? // Open WebUI API key for one-way prompt sync
   updatedAt    DateTime @updatedAt
 }

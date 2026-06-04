@@ -3,6 +3,7 @@ import { checkHealth } from "@/lib/health";
 import { SettingsForm } from "@/components/SettingsForm";
 import { HealthBanner } from "@/components/HealthBanner";
 import { CaptureSetup } from "@/components/CaptureSetup";
+import { OwuiSync } from "@/components/OwuiSync";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,6 +28,10 @@ export default async function SettingsPage() {
 
       <div className="mt-10 border-t border-border pt-6">
         <CaptureSetup />
+      </div>
+
+      <div className="mt-10 border-t border-border pt-6">
+        <OwuiSync />
       </div>
     </div>
   );

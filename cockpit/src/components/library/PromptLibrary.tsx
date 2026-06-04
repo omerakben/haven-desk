@@ -152,6 +152,24 @@ export function PromptLibrary({
                 />
               </label>
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                const res = await fetch("/api/prompts/sync", { method: "POST" });
+                const data = await res.json();
+                if (!res.ok) {
+                  toast.error(data.error || "Sync failed");
+                  return;
+                }
+                toast.success(
+                  `Synced ${data.synced} prompt(s)` +
+                    (data.skipped ? `, skipped ${data.skipped}` : "")
+                );
+              }}
+            >
+              Sync to Open WebUI
+            </Button>
           </div>
 
           {filtered.length === 0 ? (
