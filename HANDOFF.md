@@ -2,6 +2,12 @@
 
 This repo is ready to version-control and continue building in Claude Code.
 
+> **Status (2026-06-04):** The foundation milestone has landed. The repo is
+> already git-initialized locally (branch `foundation`, off `main`),
+> `cockpit/node_modules` was cleaned and reinstalled on macOS, and the engine tag
+> is `gemma4:12b-mlx`. Steps 1–2 below are done; they remain as reference for
+> creating the GitHub remote and pushing.
+
 ## 1. First, clean up
 
 A Linux `cockpit/node_modules/` may have been left by initial scaffolding. Remove it so a clean macOS install happens later:

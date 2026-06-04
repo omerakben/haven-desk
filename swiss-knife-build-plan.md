@@ -3,6 +3,12 @@
 **Owner:** Ozzy · **Machine:** Apple M5 / 48GB · **Date:** 2026-06-04
 **Goal:** A locally-run, private "daily cockpit" web app powered by local Gemma 4 12B, combining productivity tools, AI assistants, and a project knowledge base — with no third-party logging and all data on-machine.
 
+> **Status (2026-06-04):** The foundation milestone landed on top of Phase 0+1.
+> Engine tag corrected to `gemma4:12b-mlx`; streaming AI-tool kit, shadcn/ui +
+> dark mode, in-app settings + health checks, and ESLint/Playwright are in place.
+> See `CLAUDE.md` for the current architecture and the per-tool convention; the
+> sections below are the original plan and decisions.
+
 ---
 
 ## 1. Decisions locked in
@@ -20,7 +26,7 @@
 ## 2. Architecture (3 layers)
 
 **Layer 1 — Engine (Ollama, already chosen)**
-- `gemma4:12b` for chat/generation and image understanding (natively multimodal).
+- `gemma4:12b-mlx` for chat/generation and image understanding (natively multimodal).
 - An embedding model (`embeddinggemma` or `nomic-embed-text`) for the knowledge base.
 - Exposes an OpenAI-compatible API at `http://localhost:11434/v1` that both layers above talk to.
 
@@ -38,7 +44,7 @@
 - SQLite via Prisma for cockpit data: todos, Kanban cards, projects, saved prompts, drafts, lightweight memory facts.
 - PDFs/docs for deep RAG live in Open WebUI; the cockpit links to them. Everything stays on the M5.
 
-**Cockpit tech**: Next.js 15 (App Router), Tailwind + shadcn/ui, dnd-kit (Kanban drag-drop), Prisma + SQLite, `openai` npm client pointed at the local endpoint, `pdf-parse` for ingest.
+**Cockpit tech**: Next.js 15 (App Router), Tailwind + shadcn/ui, dnd-kit (Kanban drag-drop), Prisma + SQLite, a thin fetch client to the local OpenAI-compatible endpoint. (Images use Gemma vision; PDFs go through Open WebUI rather than a local parser.)
 
 ---
 
@@ -47,23 +53,24 @@
 | Feature | Lives in | Notes |
 |---|---|---|
 | Prompt optimizer | Cockpit | One-shot AI action; great first end-to-end proof |
-| Prompt library | Cockpit (+ Open WebUI has one too) | Stored in SQLite, reusable/taggable |
+| Prompt library | Cockpit (+ Open WebUI has one too) | Stored in SQLite, reusable/taggable, variable templates |
 | Email writer + brainstorming | Cockpit | Text AI actions reusing the same Ollama client |
-| Todo + Kanban | Cockpit | Standard app work; light model dependence |
-| Knowledge base | Open WebUI | RAG over PDFs/docs per project; cockpit links in |
+| Todo + Kanban | Cockpit | One Task model, list + dnd-kit board |
+| Knowledge base | Open WebUI | RAG over PDFs/docs per project; cockpit deep-links in |
 | Memory | Cockpit | Lightweight facts store injected into prompts |
-| Images / screenshots | Cockpit + Open WebUI | Sent to gemma4 vision |
-| Clipboard quick-capture | Cockpit | Fast capture into notes/knowledge |
+| Images / screenshots | Cockpit | Sent to gemma4 vision |
+| Clipboard quick-capture | Cockpit | macOS Shortcut → capture API |
 
 ---
 
 ## 4. Phased build order (value early, not all-at-once)
 
-- **Phase 0 — Engine:** Pull `gemma4:12b` + embedding model; get Open WebUI running and talking to Ollama. Verify.
+- **Phase 0 — Engine:** Pull `gemma4:12b-mlx` + embedding model; get Open WebUI running and talking to Ollama. Verify.
 - **Phase 1 — Cockpit skeleton:** Next.js app, layout, dashboard, SQLite/Prisma, Ollama client wired, **prompt optimizer working end-to-end.** First thing you can actually use.
-- **Phase 2 — Text AI tools:** Prompt library + email writer + brainstorming (fast wins, shared client).
+- **Foundation (added):** correct model tag, git, shadcn + dark mode, streaming AI-tool kit, settings + health, ESLint + Playwright. The reusable base for every later tool.
+- **Phase 2 — Text AI tools:** Prompt library + email writer + brainstorming (fast wins, shared kit).
 - **Phase 3 — Productivity:** Todo + Kanban (dnd-kit).
-- **Phase 4 — Knowledge & memory:** Wire Open WebUI knowledge per project; PDF ingest; lightweight memory; image input.
+- **Phase 4 — Knowledge & memory:** Wire Open WebUI knowledge per project; memory facts; image input.
 - **Phase 5 — Multimodal polish:** Clipboard quick-capture, screenshots, project hub linking.
 
 ---
@@ -76,8 +83,8 @@
 
 ---
 
-## 6. Open questions before Phase 1
+## 6. Resolved setup questions
 
-1. Open WebUI via **Docker** (cleaner) or **pip** (lighter)? — affects setup steps.
-2. Want a one-command **launcher** (start Ollama + Open WebUI + cockpit together) from day one, or add later?
-3. Confirm I should **start with Phase 0 + 1** now.
+1. Open WebUI via **Docker** (chosen) — see `docker-compose.yml`.
+2. One-command **launcher** from day one — `start.sh`.
+3. Started with Phase 0 + 1, then the foundation milestone.
