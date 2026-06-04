@@ -4,6 +4,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const tools = [
   { href: "/", label: "Dashboard" },
   { href: "/tools/prompt-optimizer", label: "Prompt Optimizer" },
+  { href: "/tools/prompt-library", label: "Prompt Library" },
   { href: "/settings", label: "Settings" },
 ];
 

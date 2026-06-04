@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Square } from "lucide-react";
+import { Square } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAiTool } from "@/hooks/useAiTool";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AiOutput } from "@/components/tools/AiOutput";
 
 export type AiToolShellProps = {
   title: string;
@@ -24,9 +24,9 @@ export type AiToolShellProps = {
 };
 
 /**
- * The shared shell every AI tool renders: an input, Run/Stop, a streamed
- * output panel with copy, and an optional "run & save" button. The page just
- * supplies the endpoint, labels, and how to build the request body.
+ * Shared shell for single-input AI tools: input, Run/Stop, streamed output with
+ * copy, and an optional run-and-save button. Richer tools compose useAiTool +
+ * AiOutput directly with their own inputs.
  */
 export function AiToolShell({
   title,
@@ -87,32 +87,7 @@ export function AiToolShell({
 
       {error && <p className="mt-4 text-sm text-destructive">⚠ {error}</p>}
 
-      {(output || status === "streaming") && (
-        <Card className="mt-6">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {outputLabel}
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={!output}
-              onClick={() => {
-                navigator.clipboard.writeText(output);
-                toast.success("Copied");
-              }}
-            >
-              <Copy className="mr-1 h-4 w-4" /> Copy
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <pre className="whitespace-pre-wrap break-words text-sm">
-              {output}
-              {status === "streaming" && <span className="animate-pulse">▍</span>}
-            </pre>
-          </CardContent>
-        </Card>
-      )}
+      <AiOutput output={output} status={status} label={outputLabel} />
     </div>
   );
 }
