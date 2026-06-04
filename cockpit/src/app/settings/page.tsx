@@ -1,0 +1,28 @@
+import { getEffectiveConfig, DEFAULTS } from "@/lib/config";
+import { checkHealth } from "@/lib/health";
+import { SettingsForm } from "@/components/SettingsForm";
+import { HealthBanner } from "@/components/HealthBanner";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export default async function SettingsPage() {
+  const [config, health] = await Promise.all([getEffectiveConfig(), checkHealth()]);
+
+  return (
+    <div className="max-w-2xl">
+      <h1 className="text-2xl font-semibold">Settings</h1>
+      <p className="mt-1 text-muted-foreground">
+        Local engine configuration. These override the environment defaults.
+      </p>
+
+      <div className="mt-6">
+        <HealthBanner initial={health} showWhenOk />
+      </div>
+
+      <div className="mt-6">
+        <SettingsForm initialConfig={config} defaults={DEFAULTS} />
+      </div>
+    </div>
+  );
+}
