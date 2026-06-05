@@ -26,19 +26,23 @@ export async function POST() {
     Authorization: `Bearer ${key}`,
   };
 
-  // Which commands already exist in Open WebUI? (Also our connectivity/auth probe.)
-  const existing = new Set<string>();
+  // Map existing command -> prompt id (also our connectivity/auth probe). Open
+  // WebUI updates prompts by id, so we need the id of any already-synced command.
+  const existing = new Map<string, string>();
   try {
     const listRes = await fetch(`${OWUI_BASE}/api/v1/prompts/`, { headers, cache: "no-store" });
     if (listRes.status === 401 || listRes.status === 403) {
       return Response.json(
-        { error: "Open WebUI rejected the API key. Recreate it in Open WebUI → Settings → Account → API Keys." },
+        {
+          error:
+            "Open WebUI rejected the API key. Recreate it (Settings → Account → API Keys; the admin 'API Keys' setting must be enabled).",
+        },
         { status: 502 }
       );
     }
     if (listRes.ok) {
-      const arr = (await listRes.json().catch(() => [])) as Array<{ command?: string }>;
-      for (const x of arr) if (x.command) existing.add(x.command);
+      const arr = (await listRes.json().catch(() => [])) as Array<{ command?: string; id?: string }>;
+      for (const x of arr) if (x.command && x.id) existing.set(x.command, x.id);
     }
   } catch {
     return Response.json(
@@ -55,11 +59,12 @@ export async function POST() {
   for (const p of prompts) {
     const content = p.optimized || p.original;
     const command = `/sk-${p.id.slice(-8)}`; // stable per-prompt command
-    const body = JSON.stringify({ command, title: p.title.slice(0, 100), content });
+    // Open WebUI's PromptForm field is `name` (not `title`); updates are by id.
+    const body = JSON.stringify({ command, name: p.title.slice(0, 100), content });
     try {
-      if (existing.has(command)) {
-        // command includes its leading slash, so the URL is .../command/sk-xxxx/update
-        const res = await fetch(`${OWUI_BASE}/api/v1/prompts/command${command}/update`, {
+      const existingId = existing.get(command);
+      if (existingId) {
+        const res = await fetch(`${OWUI_BASE}/api/v1/prompts/id/${existingId}/update`, {
           method: "POST",
           headers,
           body,

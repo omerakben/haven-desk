@@ -12,6 +12,7 @@ services:
     environment:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - WEBUI_AUTH=False          # single-user local; set True before sharing externally
+      - ENABLE_API_KEYS=True      # needed for the cockpit's prompt sync (default is False; enables Settings → Account → API Keys)
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
