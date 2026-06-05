@@ -10,7 +10,6 @@ import {
   useSensors,
   closestCorners,
   type DragStartEvent,
-  type DragOverEvent,
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
@@ -159,30 +158,11 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
     setActiveId(String(e.active.id));
   }
 
-  function onDragOver(e: DragOverEvent) {
-    const { active, over } = e;
-    if (!over) return;
-    const aId = String(active.id);
-    const oId = String(over.id);
-    setBoard((prev) => {
-      const ac = findContainer(aId, prev);
-      const oc = findContainer(oId, prev);
-      if (!ac || !oc || ac === oc) return prev;
-      const activeItems = prev[ac];
-      const overItems = prev[oc];
-      const ai = activeItems.findIndex((t) => t.id === aId);
-      if (ai < 0) return prev;
-      const moved = activeItems[ai];
-      const oi = overItems.findIndex((t) => t.id === oId);
-      const insertAt = oi >= 0 ? oi : overItems.length;
-      return {
-        ...prev,
-        [ac]: activeItems.filter((t) => t.id !== aId),
-        [oc]: [...overItems.slice(0, insertAt), { ...moved, status: oc }, ...overItems.slice(insertAt)],
-      };
-    });
-  }
-
+  // Moves are committed on drop (onDragEnd), not while hovering. Reordering the
+  // board during onDragOver makes the `over` target flicker at a column boundary,
+  // which re-fires onDragOver → setState in a loop ("Maximum update depth
+  // exceeded"). The dragged card follows the cursor via DragOverlay and the
+  // hovered column highlights (BoardColumn `isOver`), so the feedback stays clear.
   function onDragEnd(e: DragEndEvent) {
     const { active, over } = e;
     setActiveId(null);
@@ -276,7 +256,6 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
             sensors={sensors}
             collisionDetection={closestCorners}
             onDragStart={onDragStart}
-            onDragOver={onDragOver}
             onDragEnd={onDragEnd}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
