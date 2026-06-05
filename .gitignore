@@ -36,5 +36,10 @@ playwright-report/
 test-results/
 .playwright-mcp/
 
+# local screenshot / verification scratch (never commit these binaries)
+verify-*.png
+demo-*.png
+sk-*.png
+
 # typescript incremental build info
 *.tsbuildinfo
