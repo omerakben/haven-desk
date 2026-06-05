@@ -74,7 +74,7 @@ export function TemplateRunner({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       {vars.map((v) => (
         <div key={v.name} className="space-y-1.5">
           <Label htmlFor={`var-${v.name}`}>

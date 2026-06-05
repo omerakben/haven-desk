@@ -410,7 +410,7 @@ export function PromptLibrary({
       </Dialog>
 
       <Dialog open={!!useTemplate} onOpenChange={(o) => !o && setUseTemplate(null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[85vh] overflow-y-auto overflow-x-hidden sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{useTemplate?.name}</DialogTitle>
             {useTemplate?.description && (
