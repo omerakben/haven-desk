@@ -1,6 +1,6 @@
 // Thin client for the local Ollama OpenAI-compatible endpoint.
 const BASE = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434/v1";
-const MODEL = process.env.OLLAMA_MODEL ?? "gemma4:12b-mlx";
+const MODEL = process.env.OLLAMA_MODEL ?? "gemma4:e4b";
 
 export type ContentPart =
   | { type: "text"; text: string }

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 // Defaults come from env (and ultimately the hard-coded fallbacks). The
 // Settings row, when present, overrides these at runtime.
 export const DEFAULTS = {
-  model: process.env.OLLAMA_MODEL ?? "gemma4:12b-mlx",
+  model: process.env.OLLAMA_MODEL ?? "gemma4:e4b",
   baseUrl: process.env.OLLAMA_BASE_URL ?? "http://localhost:11434/v1",
   temperature: 0.4,
 };

@@ -19,10 +19,12 @@ Target machine: Apple Silicon Mac (M5 / 48GB). Built to be shareable with collea
 
 Two chat tiers, switchable live in **Settings → Model** (a picker that lists installed Ollama models via `/api/models`, plus presets and a custom-tag fallback). Tier metadata + RAM hints live in `src/lib/models.ts`.
 
-- **Quality — `gemma4:12b-mlx`** (MLX, Apple-Silicon native; dense 12B, image input, function calling, 256K context). ~10–14 GB RAM. The default for local cockpit dev (`src/lib/config.ts` / `src/lib/ollama.ts`).
-- **Light — `gemma4:e4b`** (Gemma "effective-4B"; ~4 GB RAM). The default for the **full Docker stack** (`docker-compose.yml`), because Open WebUI + a 12B model can nearly fill 48 GB. Also `gemma4:e2b` (~2 GB) as a preset.
+- **Light (default) — `gemma4:e4b`** (Gemma "effective-4B"; ~4 GB RAM). The default everywhere (`src/lib/config.ts` / `src/lib/ollama.ts`, `docker-compose.yml`), picked for RAM headroom when Open WebUI runs alongside. Also `gemma4:e2b` (~2 GB) as a preset.
+- **Quality — `gemma4:12b-mlx`** (MLX/safetensors, Apple-Silicon native; ~10–14 GB RAM, vision, 256K context). One click away in the picker, or set `OLLAMA_MODEL=gemma4:12b-mlx`.
 
-`scripts/pull-models.sh` pulls **both** tiers (`OLLAMA_MODEL` + `OLLAMA_LIGHT_MODEL`) plus `embeddinggemma`. To force one tag everywhere, set `OLLAMA_MODEL` (env / `.env`). The Settings row still overrides env at runtime via `getEffectiveConfig()`.
+`scripts/pull-models.sh` pulls **both** tiers plus `embeddinggemma`. The Settings row overrides env at runtime via `getEffectiveConfig()`.
+
+**Runtime requirement (important):** Ollama must be the official macOS **app** (`brew install --cask ollama-app`), not the Homebrew CLI formula (`brew install ollama`). The formula's bottle ships without the `llama-server` runner, so GGUF models — `gemma4:e4b` and anything you `ollama pull` from the library — fail with "llama-server binary not found". The app bundles all runners (GGUF + MLX). Models live in `~/.ollama` and are shared between them.
 
 ## Architecture (3 layers)
 
