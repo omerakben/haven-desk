@@ -17,7 +17,12 @@ Target machine: Apple Silicon Mac (M5 / 48GB). Built to be shareable with collea
 
 ## Engine model
 
-The tag is **`gemma4:12b-mlx`** (MLX build, Apple-Silicon native; dense 12B with image input, function calling, 256K context). Pull with `ollama pull gemma4:12b-mlx`. Embedding model (Phase 4) is `embeddinggemma`. The tag lives in `scripts/pull-models.sh`, `docker-compose.yml`, `.env.example`, and the default in `src/lib/config.ts` / `src/lib/ollama.ts`. To switch tags with no code change, set `OLLAMA_MODEL` (env) or use the in-app **Settings** page.
+Two chat tiers, switchable live in **Settings → Model** (a picker that lists installed Ollama models via `/api/models`, plus presets and a custom-tag fallback). Tier metadata + RAM hints live in `src/lib/models.ts`.
+
+- **Quality — `gemma4:12b-mlx`** (MLX, Apple-Silicon native; dense 12B, image input, function calling, 256K context). ~10–14 GB RAM. The default for local cockpit dev (`src/lib/config.ts` / `src/lib/ollama.ts`).
+- **Light — `gemma4:e4b`** (Gemma "effective-4B"; ~4 GB RAM). The default for the **full Docker stack** (`docker-compose.yml`), because Open WebUI + a 12B model can nearly fill 48 GB. Also `gemma4:e2b` (~2 GB) as a preset.
+
+`scripts/pull-models.sh` pulls **both** tiers (`OLLAMA_MODEL` + `OLLAMA_LIGHT_MODEL`) plus `embeddinggemma`. To force one tag everywhere, set `OLLAMA_MODEL` (env / `.env`). The Settings row still overrides env at runtime via `getEffectiveConfig()`.
 
 ## Architecture (3 layers)
 

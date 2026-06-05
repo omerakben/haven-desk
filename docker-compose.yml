@@ -25,7 +25,10 @@ services:
       - "3000:3000"
     environment:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
-      - OLLAMA_MODEL=gemma4:12b-mlx
+      # Full Docker stack runs Open WebUI too, so default to the LIGHT model to
+      # avoid a 12B + containers nearly filling 48 GB RAM. Override per .env:
+      #   OLLAMA_MODEL=gemma4:12b-mlx  (quality). Or switch live in Settings.
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma4:e4b}
       - DATABASE_URL=file:/data/cockpit.db
     extra_hosts:
       - "host.docker.internal:host-gateway"
