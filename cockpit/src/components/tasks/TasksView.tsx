@@ -14,16 +14,24 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BoardColumn } from "./BoardColumn";
 import { TaskCard } from "./TaskCard";
 import { TaskAiTools } from "./TaskAiTools";
+import { EditTaskDialog } from "./EditTaskDialog";
 
 export type Status = "todo" | "doing" | "done";
 export type Priority = "low" | "medium" | "high";
@@ -56,6 +64,9 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
   const [board, setBoard] = useState<Board>(() => group(initialTasks));
   const [activeId, setActiveId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
+  const [newPriority, setNewPriority] = useState<Priority>("medium");
+  const [newDue, setNewDue] = useState("");
+  const [editing, setEditing] = useState<Task | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -69,11 +80,14 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
   async function addTask() {
     const t = title.trim();
     if (!t) return;
+    const priority = newPriority;
+    const dueDate = newDue || null;
     setTitle("");
+    setNewDue("");
     const res = await fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: t }),
+      body: JSON.stringify({ title: t, priority, dueDate }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -81,6 +95,14 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
       return;
     }
     setBoard((prev) => ({ ...prev, todo: [...prev.todo, data.task as Task] }));
+  }
+
+  /** Replace a task in place after an edit (status is unchanged by the dialog). */
+  function replaceTask(updated: Task) {
+    setBoard((prev) => {
+      const repl = (arr: Task[]) => arr.map((t) => (t.id === updated.id ? updated : t));
+      return { todo: repl(prev.todo), doing: repl(prev.doing), done: repl(prev.done) };
+    });
   }
 
   async function deleteTask(id: string) {
@@ -202,7 +224,7 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
         Plan as a list or a board. Drag cards to reorder and move across columns.
       </p>
 
-      <div className="mt-6 flex gap-2">
+      <div className="mt-6 flex flex-wrap items-end gap-2">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -210,7 +232,24 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
           onKeyDown={(e) => {
             if (e.key === "Enter") addTask();
           }}
-          className="max-w-md"
+          className="w-full max-w-xs"
+        />
+        <Select value={newPriority} onValueChange={(v) => setNewPriority(v as Priority)}>
+          <SelectTrigger className="w-28" aria-label="Priority">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low">low</SelectItem>
+            <SelectItem value="medium">medium</SelectItem>
+            <SelectItem value="high">high</SelectItem>
+          </SelectContent>
+        </Select>
+        <Input
+          type="date"
+          value={newDue}
+          onChange={(e) => setNewDue(e.target.value)}
+          aria-label="Due date"
+          className="w-40"
         />
         <Button onClick={addTask} disabled={!title.trim()}>
           <Plus className="mr-1 h-4 w-4" /> Add
@@ -244,6 +283,7 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
                   id={c.id}
                   label={c.label}
                   tasks={board[c.id]}
+                  onEdit={setEditing}
                   onDelete={deleteTask}
                 />
               ))}
@@ -294,6 +334,15 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
+                    aria-label="Edit task"
+                    onClick={() => setEditing(t)}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
                     aria-label="Delete task"
                     onClick={() => deleteTask(t.id)}
                   >
@@ -305,6 +354,8 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
           )}
         </TabsContent>
       </Tabs>
+
+      <EditTaskDialog task={editing} onClose={() => setEditing(null)} onSaved={replaceTask} />
     </div>
   );
 }

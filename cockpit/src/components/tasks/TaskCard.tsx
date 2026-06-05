@@ -2,7 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trash2, GripVertical } from "lucide-react";
+import { Trash2, GripVertical, Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,15 @@ const PRIORITY_VARIANT = {
   high: "destructive",
 } as const;
 
-export function TaskCard({ task, onDelete }: { task: Task; onDelete: (id: string) => void }) {
+export function TaskCard({
+  task,
+  onEdit,
+  onDelete,
+}: {
+  task: Task;
+  onEdit: (task: Task) => void;
+  onDelete: (id: string) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
   });
@@ -52,15 +60,26 @@ export function TaskCard({ task, onDelete }: { task: Task; onDelete: (id: string
             )}
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 shrink-0"
-          aria-label="Delete task"
-          onClick={() => onDelete(task.id)}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
+        <div className="flex shrink-0 items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            aria-label="Edit task"
+            onClick={() => onEdit(task)}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            aria-label="Delete task"
+            onClick={() => onDelete(task.id)}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
     </div>
   );

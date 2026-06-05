@@ -10,11 +10,13 @@ export function BoardColumn({
   id,
   label,
   tasks,
+  onEdit,
   onDelete,
 }: {
   id: string;
   label: string;
   tasks: Task[];
+  onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
@@ -34,7 +36,7 @@ export function BoardColumn({
       >
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.map((t) => (
-            <TaskCard key={t.id} task={t} onDelete={onDelete} />
+            <TaskCard key={t.id} task={t} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </SortableContext>
       </div>
