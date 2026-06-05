@@ -18,6 +18,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type Fact = {
   id: string;
@@ -26,18 +33,33 @@ export type Fact = {
   source: string;
   status: string;
   pinned: boolean;
+  projectId: string | null;
+  projectName: string | null;
 };
 
-export function MemoryManager({ facts }: { facts: Fact[] }) {
+const ALL = "__all__";
+const NONE = "__none__";
+
+export function MemoryManager({
+  facts,
+  projects,
+}: {
+  facts: Fact[];
+  projects: { id: string; name: string }[];
+}) {
   const router = useRouter();
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [filterProject, setFilterProject] = useState(ALL);
 
-  const pending = facts.filter((f) => f.status === "pending");
-  const active = facts.filter((f) => f.status === "active");
+  const inFilter = (f: Fact) =>
+    filterProject === ALL ||
+    (filterProject === NONE ? f.projectId === null : f.projectId === filterProject);
+  const pending = facts.filter((f) => f.status === "pending" && inFilter(f));
+  const active = facts.filter((f) => f.status === "active" && inFilter(f));
 
   async function add() {
     if (!value.trim()) return;
@@ -131,6 +153,26 @@ export function MemoryManager({ facts }: { facts: Fact[] }) {
         </Button>
       </div>
 
+      {projects.length > 0 && (
+        <div className="mt-4 flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Project</span>
+          <Select value={filterProject} onValueChange={setFilterProject}>
+            <SelectTrigger className="h-8 w-48" aria-label="Filter by project">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All projects</SelectItem>
+              <SelectItem value={NONE}>No project</SelectItem>
+              {projects.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {pending.length > 0 && (
         <div className="mt-8">
           <h2 className="text-sm font-medium text-muted-foreground">Suggested — review</h2>
@@ -142,6 +184,11 @@ export function MemoryManager({ facts }: { facts: Fact[] }) {
                     ai
                   </Badge>
                   <span className="flex-1 text-sm">{f.value}</span>
+                  {f.projectName && (
+                    <Badge variant="outline" className="text-[10px]">
+                      {f.projectName}
+                    </Badge>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -182,6 +229,11 @@ export function MemoryManager({ facts }: { facts: Fact[] }) {
                     </Badge>
                   )}
                   <span className="flex-1 text-sm">{f.value}</span>
+                  {f.projectName && (
+                    <Badge variant="outline" className="text-[10px]">
+                      {f.projectName}
+                    </Badge>
+                  )}
                   <Badge variant="secondary" className="text-[10px]">
                     {f.source}
                   </Badge>

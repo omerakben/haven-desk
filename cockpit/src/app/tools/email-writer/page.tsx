@@ -7,7 +7,11 @@ export const dynamic = "force-dynamic";
 
 export default async function EmailWriterPage() {
   const rows = await prisma.emailDraft
-    .findMany({ orderBy: { createdAt: "desc" }, take: 20 })
+    .findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      include: { project: { select: { name: true } } },
+    })
     .catch(() => []);
 
   const drafts = rows.map((d) => ({
@@ -15,6 +19,7 @@ export default async function EmailWriterPage() {
     title: d.title || "Untitled draft",
     badges: [d.mode, d.tone, d.length],
     body: d.body,
+    project: d.project?.name ?? null,
     editValues: { title: d.title ?? "", body: d.body },
   }));
 

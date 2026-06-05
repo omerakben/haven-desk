@@ -53,6 +53,11 @@ export function TaskCard({
             <Badge variant={PRIORITY_VARIANT[task.priority]} className="text-[10px]">
               {task.priority}
             </Badge>
+            {task.projectName && (
+              <Badge variant="secondary" className="text-[10px]">
+                {task.projectName}
+              </Badge>
+            )}
             {task.dueDate && (
               <span className="text-[11px] text-muted-foreground">
                 due {new Date(task.dueDate).toLocaleDateString()}

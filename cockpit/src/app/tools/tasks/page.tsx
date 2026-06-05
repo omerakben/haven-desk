@@ -6,7 +6,10 @@ export const dynamic = "force-dynamic";
 
 export default async function TasksPage() {
   const rows = await prisma.task
-    .findMany({ orderBy: [{ order: "asc" }, { createdAt: "asc" }] })
+    .findMany({
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+      include: { project: { select: { name: true } } },
+    })
     .catch(() => []);
 
   const tasks: Task[] = rows.map((t) => ({
@@ -17,6 +20,7 @@ export default async function TasksPage() {
     priority: t.priority as Task["priority"],
     dueDate: t.dueDate ? t.dueDate.toISOString() : null,
     order: t.order,
+    projectName: t.project?.name ?? null,
   }));
 
   return <TasksView initialTasks={tasks} />;

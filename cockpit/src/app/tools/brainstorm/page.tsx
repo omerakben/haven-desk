@@ -10,7 +10,13 @@ export default async function BrainstormPage() {
     prisma.template
       .findMany({ where: { kind: "technique", archived: false }, orderBy: { name: "asc" } })
       .catch(() => []),
-    prisma.idea.findMany({ orderBy: { createdAt: "desc" }, take: 20 }).catch(() => []),
+    prisma.idea
+      .findMany({
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        include: { project: { select: { name: true } } },
+      })
+      .catch(() => []),
   ]);
 
   const techniques = techniqueRows.map((t) => ({
@@ -26,6 +32,7 @@ export default async function BrainstormPage() {
     title: i.title || i.topic || "Idea",
     badges: i.techniqueKind ? [i.techniqueKind] : [],
     body: i.content,
+    project: i.project?.name ?? null,
     editValues: { title: i.title ?? "", content: i.content, tags: i.tags ?? "" },
   }));
 

@@ -25,6 +25,8 @@ export type RecentItem = {
   title: string;
   badges?: string[];
   body: string;
+  /** Project name, shown as a badge when the item is project-scoped. */
+  project?: string | null;
   /** Current values for the editable fields (keyed by EditField.key). */
   editValues?: Record<string, string>;
 };
@@ -74,6 +76,11 @@ export function RecentItems({
             <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 py-3">
               <CardTitle className="flex flex-wrap items-center gap-2 text-sm">
                 {it.title}
+                {it.project && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    {it.project}
+                  </Badge>
+                )}
                 {it.badges?.map((b) => (
                   <Badge key={b} variant="outline" className="text-[10px]">
                     {b}

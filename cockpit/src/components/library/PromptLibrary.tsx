@@ -31,6 +31,7 @@ export type LibPrompt = {
   tags: string | null;
   favorite: boolean;
   source: string;
+  project?: string | null;
 };
 
 export type LibTemplate = {
@@ -235,7 +236,14 @@ export function PromptLibrary({
               {filtered.map((p) => (
                 <Card key={p.id}>
                   <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 py-3">
-                    <CardTitle className="text-base">{p.title}</CardTitle>
+                    <CardTitle className="flex flex-wrap items-center gap-2 text-base">
+                      {p.title}
+                      {p.project && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {p.project}
+                        </Badge>
+                      )}
+                    </CardTitle>
                     <div className="flex shrink-0 gap-1">
                       <Button
                         variant="ghost"

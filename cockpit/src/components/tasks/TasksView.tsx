@@ -43,6 +43,7 @@ export type Task = {
   priority: Priority;
   dueDate: string | null;
   order: number;
+  projectName?: string | null;
 };
 
 type Board = Record<Status, Task[]>;

@@ -7,7 +7,10 @@ export const dynamic = "force-dynamic";
 export default async function PromptLibraryPage() {
   const [promptRows, templateRows] = await Promise.all([
     prisma.prompt
-      .findMany({ orderBy: [{ favorite: "desc" }, { createdAt: "desc" }] })
+      .findMany({
+        orderBy: [{ favorite: "desc" }, { createdAt: "desc" }],
+        include: { project: { select: { name: true } } },
+      })
       .catch(() => []),
     prisma.template
       .findMany({ where: { kind: "prompt", archived: false }, orderBy: { name: "asc" } })
@@ -22,6 +25,7 @@ export default async function PromptLibraryPage() {
     tags: p.tags,
     favorite: p.favorite,
     source: p.source,
+    project: p.project?.name ?? null,
   }));
 
   const templates = templateRows.map((t) => ({
