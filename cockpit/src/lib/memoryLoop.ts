@@ -228,6 +228,54 @@ export async function learnFromText(args: {
   return { created, merges, skipped, candidates: out };
 }
 
+/**
+ * Backfill categories on facts that have none (e.g. seeded-pack facts that
+ * predate the taxonomy). Additive only — never overwrites an existing category,
+ * and validates every label against the fixed set. Scoped to a project + global
+ * when projectId is given. Returns how many were classified.
+ */
+export async function classifyUncategorized(projectId?: string | null): Promise<{ classified: number }> {
+  const scope = projectId ? { OR: [{ projectId: null }, { projectId }] } : {};
+  const rows = await prisma.memoryFact.findMany({
+    where: { status: { in: ["active", "pending"] }, category: null, ...scope },
+    select: { id: true, value: true },
+  });
+  if (rows.length === 0) return { classified: 0 };
+
+  const cfg = await getEffectiveConfig();
+  const BATCH = 12;
+  let classified = 0;
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const slice = rows.slice(i, i + BATCH);
+    const list = slice.map((r, idx) => `${idx + 1}. ${r.value}`).join("\n");
+    const out = await chat(
+      [
+        {
+          role: "system",
+          content:
+            `Classify each numbered fact into exactly one category from this set: ${FACT_CATEGORIES.join(", ")}. ` +
+            'Return ONLY lines in the form "<number>. <category>", one per fact, no commentary.',
+        },
+        { role: "user", content: list },
+      ],
+      { model: cfg.model, baseUrl: cfg.baseUrl, temperature: 0.1 }
+    );
+
+    const byIndex = new Map<number, FactCategory>();
+    for (const line of out.split("\n")) {
+      const m = line.match(/^\s*(\d+)\s*[.):\-]\s*([a-zA-Z]+)/);
+      if (m) byIndex.set(Number(m[1]), normalizeCategory(m[2]));
+    }
+    for (let k = 0; k < slice.length; k++) {
+      const cat = byIndex.get(k + 1);
+      if (!cat) continue;
+      await prisma.memoryFact.update({ where: { id: slice[k].id }, data: { category: cat } });
+      classified++;
+    }
+  }
+  return { classified };
+}
+
 /** Embed every active/pending fact that lacks a vector. Returns indexed/total. */
 export async function reindexFacts(): Promise<{ indexed: number; total: number }> {
   const statuses = ["active", "pending"];

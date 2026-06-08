@@ -14,6 +14,7 @@ import {
   Merge,
   Search,
   ArchiveRestore,
+  Tags,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -64,6 +65,21 @@ type PreviewFact = {
 
 const ALL = "__all__";
 const NONE = "__none__";
+const ALLCAT = "__allcat__";
+const UNCAT = "__uncat__";
+
+// Display order for grouping; must match the taxonomy in lib/memory.ts. Kept
+// local so this client component never imports the server-only memory lib.
+const CATEGORY_ORDER = [
+  "glossary",
+  "preference",
+  "standard",
+  "constraint",
+  "workflow",
+  "person",
+  "project",
+  "general",
+];
 
 function CategoryBadge({ category }: { category: string | null }) {
   if (!category) return null;
@@ -91,7 +107,10 @@ export function MemoryManager({
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [filterProject, setFilterProject] = useState(ALL);
+  const [filterCategory, setFilterCategory] = useState(ALLCAT);
+  const [search, setSearch] = useState("");
   const [reindexing, setReindexing] = useState(false);
+  const [classifying, setClassifying] = useState(false);
 
   // Inline edit (one fact at a time).
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -109,7 +128,17 @@ export function MemoryManager({
     filterProject === ALL ||
     (filterProject === NONE ? f.projectId === null : f.projectId === filterProject);
 
-  const visible = facts.filter(inFilter);
+  const inCategory = (f: Fact) =>
+    filterCategory === ALLCAT ||
+    (filterCategory === UNCAT ? !f.category : f.category === filterCategory);
+
+  const matchesSearch = (f: Fact) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return `${f.value} ${f.key ?? ""}`.toLowerCase().includes(q);
+  };
+
+  const visible = facts.filter((f) => inFilter(f) && inCategory(f) && matchesSearch(f));
   const pendingNew = visible.filter((f) => f.status === "pending" && !f.mergedIntoId);
   const pendingMerge = visible.filter((f) => f.status === "pending" && f.mergedIntoId);
   const active = visible.filter((f) => f.status === "active");
@@ -205,6 +234,39 @@ export function MemoryManager({
     }
   }
 
+  async function classify() {
+    setClassifying(true);
+    try {
+      const res = await fetch("/api/memory/classify", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      toast.success(
+        data.classified > 0 ? `Classified ${data.classified} fact(s)` : "Everything already categorized"
+      );
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setClassifying(false);
+    }
+  }
+
+  // Group active facts by category for the grouped list (Uncategorized last).
+  function groupByCategory(list: Fact[]): [string, Fact[]][] {
+    const groups = new Map<string, Fact[]>();
+    for (const f of list) {
+      const c = f.category ?? UNCAT;
+      if (!groups.has(c)) groups.set(c, []);
+      groups.get(c)!.push(f);
+    }
+    const ordered: [string, Fact[]][] = [];
+    for (const c of CATEGORY_ORDER) if (groups.has(c)) ordered.push([c, groups.get(c)!]);
+    for (const [c, arr] of groups)
+      if (c !== UNCAT && !CATEGORY_ORDER.includes(c)) ordered.push([c, arr]);
+    if (groups.has(UNCAT)) ordered.push([UNCAT, groups.get(UNCAT)!]);
+    return ordered;
+  }
+
   async function runPreview() {
     if (!previewQ.trim()) return;
     setPreviewBusy(true);
@@ -266,14 +328,28 @@ export function MemoryManager({
           <RefreshCw className={"mr-1 h-4 w-4 " + (reindexing ? "animate-spin" : "")} />
           {reindexing ? "Indexing…" : "Reindex"}
         </Button>
+        <Button variant="outline" onClick={classify} disabled={classifying} title="Assign a category to any uncategorized facts">
+          <Tags className="mr-1 h-4 w-4" />
+          {classifying ? "Classifying…" : "Classify"}
+        </Button>
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search facts…"
+            className="h-8 w-56"
+            aria-label="Search facts"
+          />
+        </div>
         {projects.length > 0 && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Project</span>
             <Select value={filterProject} onValueChange={setFilterProject}>
-              <SelectTrigger className="h-8 w-48" aria-label="Filter by project">
+              <SelectTrigger className="h-8 w-44" aria-label="Filter by project">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -288,6 +364,23 @@ export function MemoryManager({
             </Select>
           </div>
         )}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Category</span>
+          <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <SelectTrigger className="h-8 w-40" aria-label="Filter by category">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALLCAT}>All categories</SelectItem>
+              {CATEGORY_ORDER.map((c) => (
+                <SelectItem key={c} value={c} className="capitalize">
+                  {c}
+                </SelectItem>
+              ))}
+              <SelectItem value={UNCAT}>Uncategorized</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <span className="text-xs text-muted-foreground">
           {indexedCount}/{active.length} active facts indexed for relevance
         </span>
@@ -468,69 +561,84 @@ export function MemoryManager({
       <div className="mt-8">
         <h2 className="text-sm font-medium text-muted-foreground">Active facts ({active.length})</h2>
         {active.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">No facts yet. Add one or suggest from text.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {facts.some((f) => f.status === "active")
+              ? "No active facts match your search or filters."
+              : "No facts yet. Add one or suggest from text."}
+          </p>
         ) : (
-          <div className="mt-2 space-y-2">
-            {active.map((f) => (
-              <Card key={f.id}>
-                <CardContent className="flex items-center gap-3 py-3">
-                  {f.key && (
-                    <Badge variant="outline" className="text-[10px]">
-                      {f.key}
-                    </Badge>
-                  )}
-                  <CategoryBadge category={f.category} />
-                  {editingId === f.id ? (
-                    <Input
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      className="flex-1"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveEdit(f.id);
-                        if (e.key === "Escape") setEditingId(null);
-                      }}
-                    />
-                  ) : (
-                    <span className="flex-1 text-sm">{f.value}</span>
-                  )}
-                  {f.projectName && (
-                    <Badge variant="outline" className="text-[10px]">
-                      {f.projectName}
-                    </Badge>
-                  )}
-                  <Badge variant="secondary" className="text-[10px]">
-                    {f.source}
-                  </Badge>
-                  {editingId === f.id ? (
-                    <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Save edit" onClick={() => saveEdit(f.id)}>
-                      <Check className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit fact" onClick={() => startEdit(f)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={"h-7 w-7 " + (f.pinned ? "text-yellow-500" : "")}
-                    aria-label="Pin fact"
-                    onClick={() => patch(f.id, { pinned: !f.pinned })}
-                  >
-                    <Pin className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    aria-label="Delete fact"
-                    onClick={() => remove(f.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
+          <div className="mt-2 space-y-4">
+            {groupByCategory(active).map(([cat, items]) => (
+              <div key={cat}>
+                <div className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground/70">
+                  <span className={cat === UNCAT ? "" : "capitalize"}>
+                    {cat === UNCAT ? "Uncategorized" : cat}
+                  </span>{" "}
+                  ({items.length})
+                </div>
+                <div className="space-y-2">
+                  {items.map((f) => (
+                    <Card key={f.id}>
+                      <CardContent className="flex items-center gap-3 py-3">
+                        {f.key && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {f.key}
+                          </Badge>
+                        )}
+                        {editingId === f.id ? (
+                          <Input
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            className="flex-1"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveEdit(f.id);
+                              if (e.key === "Escape") setEditingId(null);
+                            }}
+                          />
+                        ) : (
+                          <span className="flex-1 text-sm">{f.value}</span>
+                        )}
+                        {f.projectName && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {f.projectName}
+                          </Badge>
+                        )}
+                        <Badge variant="secondary" className="text-[10px]">
+                          {f.source}
+                        </Badge>
+                        {editingId === f.id ? (
+                          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Save edit" onClick={() => saveEdit(f.id)}>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit fact" onClick={() => startEdit(f)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={"h-7 w-7 " + (f.pinned ? "text-yellow-500" : "")}
+                          aria-label="Pin fact"
+                          onClick={() => patch(f.id, { pinned: !f.pinned })}
+                        >
+                          <Pin className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          aria-label="Delete fact"
+                          onClick={() => remove(f.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}

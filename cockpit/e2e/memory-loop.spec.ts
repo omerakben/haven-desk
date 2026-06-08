@@ -8,6 +8,9 @@ test.describe("memory loop", () => {
     await expect(page.getByRole("heading", { name: /memory/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /suggest from text/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /reindex/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /classify/i })).toBeVisible();
+    await expect(page.getByPlaceholder(/search facts/i)).toBeVisible();
+    await expect(page.getByRole("combobox", { name: /filter by category/i })).toBeVisible();
     await expect(page.getByText("Relevance preview", { exact: true })).toBeVisible();
   });
 
