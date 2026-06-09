@@ -261,6 +261,12 @@ export function QaPipeline() {
           rows={6}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && input.trim() && !busyNew) {
+              e.preventDefault();
+              startRun();
+            }
+          }}
           placeholder="Paste a user story / requirement…"
           disabled={busyNew}
         />

@@ -63,6 +63,12 @@ export function AiToolShell({
         value={input}
         placeholder={placeholder}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && input.trim() && !isRunning) {
+            e.preventDefault();
+            handleRun(false);
+          }
+        }}
         disabled={isRunning}
       />
 
