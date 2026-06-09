@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { Search, CornerDownLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -17,6 +18,7 @@ const NAV: { label: string; href: string; keywords?: string }[] = [
   { label: "Email Writer", href: "/tools/email-writer", keywords: "compose reply" },
   { label: "Brainstorming", href: "/tools/brainstorm", keywords: "ideas techniques" },
   { label: "Image", href: "/tools/image", keywords: "vision photo" },
+  { label: "Smart Inbox", href: "/tools/inbox", keywords: "drop paste sort" },
   { label: "Tasks", href: "/tools/tasks", keywords: "todo kanban board" },
   { label: "Gherkin Lint", href: "/tools/gherkin-lint", keywords: "bdd feature" },
   { label: "ADR Writer", href: "/tools/adr", keywords: "decision record madr architecture" },
@@ -26,33 +28,61 @@ const NAV: { label: string; href: string; keywords?: string }[] = [
   { label: "API Contract", href: "/tools/api-contract", keywords: "openapi swagger rest endpoint yaml" },
   { label: "Complexity", href: "/tools/complexity", keywords: "big-o performance algorithm hotspots" },
   { label: "QA Pipeline", href: "/tools/qa-pipeline", keywords: "story rubric test" },
+  { label: "Bug Report", href: "/tools/bug-report", keywords: "defect repro severity" },
   { label: "Memory", href: "/tools/memory", keywords: "facts glossary" },
+  { label: "Activity", href: "/tools/activity", keywords: "timeline log history" },
   { label: "Projects", href: "/tools/projects", keywords: "hub" },
   { label: "Settings", href: "/settings", keywords: "model theme health" },
 ];
 
+// One-keystroke actions (badge "Run"), filtered like NAV entries.
+type ActionId = "theme" | "reindex" | "new-qa" | "standup" | "wrapup" | "switch-project";
+const ACTIONS: { id: ActionId; label: string; keywords: string }[] = [
+  { id: "theme", label: "Toggle theme", keywords: "dark light mode appearance" },
+  { id: "switch-project", label: "Switch project…", keywords: "active workspace scope" },
+  { id: "reindex", label: "Reindex memory embeddings", keywords: "memory vectors embeddings" },
+  { id: "new-qa", label: "New QA session", keywords: "story gherkin qa pipeline" },
+  { id: "standup", label: "Run standup routine", keywords: "daily routine morning summary" },
+  { id: "wrapup", label: "Run wrap-up routine", keywords: "daily routine evening summary" },
+];
+
 const IS_MAC = typeof navigator !== "undefined" && /Mac/.test(navigator.platform);
+
+type ProjectLite = { id: string; name: string };
 
 export function CommandPalette() {
   const router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"default" | "projects">("default");
   const [q, setQ] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [projects, setProjects] = useState<ProjectLite[]>([]);
   const [active, setActive] = useState(0);
   const [answer, setAnswer] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Global ⌘K / Ctrl+K toggle, plus a custom event so other UI can open it.
+  // Global ⌘K / Ctrl+K toggle, ⌘P / Ctrl+P for the project switcher, plus a
+  // custom event so other UI can open it.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
+        setMode("default");
         setOpen((o) => !o);
+      } else if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        setMode("projects");
+        setQ("");
+        setOpen(true);
       }
     };
-    const onOpen = () => setOpen(true);
+    const onOpen = () => {
+      setMode("default");
+      setOpen(true);
+    };
     window.addEventListener("keydown", onKey);
     window.addEventListener("swissknife:command", onOpen);
     return () => {
@@ -66,9 +96,27 @@ export function CommandPalette() {
     if (open) inputRef.current?.focus();
   }, [open]);
 
-  // Debounced cross-entity search; only fires once the term is long enough.
+  // The project list loads when the palette opens (cheap, always fresh).
   useEffect(() => {
     if (!open) return;
+    let activeReq = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/projects");
+        const data = await res.json();
+        if (activeReq && res.ok) setProjects((data.projects ?? []).map((p: ProjectLite) => ({ id: p.id, name: p.name })));
+      } catch {
+        /* the switch-project list just stays empty */
+      }
+    })();
+    return () => {
+      activeReq = false;
+    };
+  }, [open]);
+
+  // Debounced cross-entity search; only fires once the term is long enough.
+  useEffect(() => {
+    if (!open || mode !== "default") return;
     const term = q.trim();
     if (term.length < 2) return;
     const t = setTimeout(async () => {
@@ -81,7 +129,7 @@ export function CommandPalette() {
       }
     }, 150);
     return () => clearTimeout(t);
-  }, [q, open]);
+  }, [q, open, mode]);
 
   const navMatches = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -89,12 +137,36 @@ export function CommandPalette() {
     return NAV.filter((n) => `${n.label} ${n.keywords ?? ""}`.toLowerCase().includes(term));
   }, [q]);
 
-  const items = useMemo(() => {
+  const actionMatches = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    if (!term) return ACTIONS;
+    return ACTIONS.filter((a) => `${a.label} ${a.keywords}`.toLowerCase().includes(term));
+  }, [q]);
+
+  type Item =
+    | { kind: "nav"; label: string; badge: string; href: string; sub?: string }
+    | { kind: "result"; label: string; badge: string; href: string; sub?: string }
+    | { kind: "ask" | "add"; label: string; badge: string; href: string }
+    | { kind: "action"; label: string; badge: string; id: ActionId }
+    | { kind: "project"; label: string; badge: string; projectId: string | null };
+
+  const items = useMemo<Item[]>(() => {
     const term = q.trim();
+
+    if (mode === "projects") {
+      const all: Item[] = [
+        { kind: "project", label: "No project — global", badge: "Switch", projectId: null },
+        ...projects.map((p) => ({ kind: "project" as const, label: p.name, badge: "Switch", projectId: p.id })),
+      ];
+      if (!term) return all;
+      return all.filter((p) => p.label.toLowerCase().includes(term.toLowerCase()));
+    }
+
     // Stale results stay in state but are hidden until the term is long enough.
     const live = term.length >= 2 ? results : [];
-    const base = [
+    const base: Item[] = [
       ...navMatches.map((n) => ({ kind: "nav" as const, label: n.label, badge: "Go", href: n.href })),
+      ...actionMatches.map((a) => ({ kind: "action" as const, label: a.label, badge: "Run", id: a.id })),
       ...live.map((r) => ({ kind: "result" as const, label: r.title, sub: r.subtitle, badge: r.type, href: r.href })),
     ];
     // Fallthrough actions: ask Gemma a one-shot question, or file the text as the
@@ -107,25 +179,29 @@ export function CommandPalette() {
       ];
     }
     return base;
-  }, [navMatches, results, q]);
+  }, [navMatches, actionMatches, results, q, mode, projects]);
 
   useEffect(() => {
     listRef.current?.querySelector<HTMLElement>(`[data-i="${active}"]`)?.scrollIntoView({ block: "nearest" });
   }, [active]);
 
+  const close = useCallback(() => {
+    setOpen(false);
+    setQ("");
+    setMode("default");
+  }, []);
+
   const go = useCallback(
     (href: string) => {
-      setOpen(false);
-      setQ("");
+      close();
       router.push(href);
     },
-    [router]
+    [router, close]
   );
 
   const quickAdd = useCallback(
     async (text: string) => {
-      setOpen(false);
-      setQ("");
+      close();
       try {
         const res = await fetch("/api/quick-add", {
           method: "POST",
@@ -145,7 +221,7 @@ export function CommandPalette() {
         toast.error(e instanceof Error ? e.message : "Couldn't add");
       }
     },
-    [router]
+    [router, close]
   );
 
   const ask = useCallback(async (question: string) => {
@@ -167,13 +243,97 @@ export function CommandPalette() {
     }
   }, []);
 
+  const switchProject = useCallback(
+    async (projectId: string | null, label: string) => {
+      close();
+      try {
+        const res = await fetch("/api/projects/active", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId }),
+        });
+        if (!res.ok) throw new Error("Couldn't switch project.");
+        toast.success(`Active project: ${label}`);
+        router.refresh();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Couldn't switch project.");
+      }
+    },
+    [router, close]
+  );
+
+  const runRoutine = useCallback(
+    async (slug: "standup" | "wrapup") => {
+      close();
+      try {
+        // Routines are token-authed (headless Shortcut recipe); fetch the same
+        // token the capture endpoint uses — all on this machine.
+        const tokenRes = await fetch("/api/capture/token");
+        const { token } = await tokenRes.json();
+        const res = await fetch(`/api/routines/${slug}`, {
+          method: "POST",
+          headers: { "x-capture-token": token ?? "" },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Routine failed.");
+        toast.success(`${slug === "standup" ? "Standup" : "Wrap-up"} captured to Ideas.`);
+        router.refresh();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Routine failed.");
+      }
+    },
+    [router, close]
+  );
+
+  const performAction = useCallback(
+    (id: ActionId) => {
+      switch (id) {
+        case "theme": {
+          const next = resolvedTheme === "dark" ? "light" : "dark";
+          setTheme(next);
+          toast.success(`Theme: ${next}`);
+          close();
+          break;
+        }
+        case "switch-project":
+          // The input keeps focus — only the mode and query change.
+          setMode("projects");
+          setQ("");
+          setActive(0);
+          break;
+        case "reindex":
+          close();
+          void fetch("/api/memory/reindex", { method: "POST" })
+            .then(async (r) => {
+              const d = await r.json().catch(() => ({}));
+              if (!r.ok) throw new Error(d?.error || "Reindex failed.");
+              toast.success("Memory embeddings reindexed.");
+            })
+            .catch((e) => toast.error(e instanceof Error ? e.message : "Reindex failed."));
+          break;
+        case "new-qa":
+          go("/tools/qa-pipeline");
+          break;
+        case "standup":
+          void runRoutine("standup");
+          break;
+        case "wrapup":
+          void runRoutine("wrapup");
+          break;
+      }
+    },
+    [resolvedTheme, setTheme, close, go, runRoutine]
+  );
+
   const run = useCallback(
-    (it: { kind: string; href: string }) => {
+    (it: Item) => {
       if (it.kind === "add") quickAdd(q.trim());
       else if (it.kind === "ask") ask(q.trim());
+      else if (it.kind === "action") performAction(it.id);
+      else if (it.kind === "project") switchProject(it.projectId, it.label);
       else go(it.href);
     },
-    [go, quickAdd, ask, q]
+    [go, quickAdd, ask, q, performAction, switchProject]
   );
 
   function onKeyDown(e: React.KeyboardEvent) {
@@ -197,7 +357,10 @@ export function CommandPalette() {
         setOpen(o);
         setActive(0);
         setAnswer(null);
-        if (!o) setQ("");
+        if (!o) {
+          setQ("");
+          setMode("default");
+        }
       }}
     >
       <DialogContent
@@ -217,19 +380,27 @@ export function CommandPalette() {
               setAnswer(null);
             }}
             onKeyDown={onKeyDown}
-            placeholder="Search prompts, tasks, facts, QA… or jump to a tool"
+            placeholder={
+              mode === "projects"
+                ? "Switch to project…"
+                : "Search prompts, tasks, facts, QA… or jump to a tool"
+            }
             className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
           <VoiceButton onText={(t) => setQ(t)} />
           <kbd className="hidden rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground sm:inline">
-            {IS_MAC ? "⌘K" : "Ctrl K"}
+            {mode === "projects" ? (IS_MAC ? "⌘P" : "Ctrl P") : IS_MAC ? "⌘K" : "Ctrl K"}
           </kbd>
         </div>
 
         <div ref={listRef} className="max-h-80 overflow-y-auto p-1">
           {items.length === 0 ? (
             <p className="px-3 py-8 text-center text-sm text-muted-foreground">
-              {q.trim().length < 2 ? "Type to search across everything." : "No matches."}
+              {mode === "projects"
+                ? "No matching project."
+                : q.trim().length < 2
+                  ? "Type to search across everything."
+                  : "No matches."}
             </p>
           ) : (
             items.map((it, i) => (
@@ -268,6 +439,7 @@ export function CommandPalette() {
           <span className="inline-flex items-center gap-1">
             <CornerDownLeft className="h-3 w-3" /> open
           </span>
+          <span>{IS_MAC ? "⌘P" : "Ctrl P"} projects</span>
           <span>esc close</span>
         </div>
       </DialogContent>
