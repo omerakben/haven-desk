@@ -67,6 +67,20 @@ test.describe("qa pipeline", () => {
     await expect(page.getByText(/no saved sessions yet/i)).toBeVisible();
   });
 
+  test("import from ticket fills the story box (mocked)", async ({ page }) => {
+    await mockBase(page, { list: [] });
+    await page.route("**/api/qa-pipeline/ingest", (route) =>
+      route.fulfill(
+        fulfill({ title: "Partial ROA payment", story: "As a cashier, I want to accept a partial ROA payment, so that the balance updates." })
+      )
+    );
+    await page.goto("/tools/qa-pipeline");
+    await page.getByRole("button", { name: /import from ticket/i }).click();
+    await page.getByPlaceholder(/paste the ticket/i).fill("LBMH01-4821 partial ROA payment at POS");
+    await page.getByRole("button", { name: /extract story/i }).click();
+    await expect(page.getByPlaceholder(/paste a user story/i)).toHaveValue(/partial ROA payment/i);
+  });
+
   test("new run opens a session view with iteration 1 (lint PASS)", async ({ page }) => {
     await mockBase(page, { list: [], post: { needsPack: false, projectId: "p1", session: session(true) } });
     await page.goto("/tools/qa-pipeline");

@@ -7,6 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { QaSessionView } from "@/components/qa/QaSessionView";
 import type { Iteration, Session, SessionSummary } from "@/components/qa/types";
 
@@ -27,6 +35,9 @@ export function QaPipeline() {
   const [input, setInput] = useState("");
   const [busyNew, setBusyNew] = useState(false);
   const [needsPack, setNeedsPack] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importBusy, setImportBusy] = useState(false);
 
   const loadList = useCallback(async () => {
     try {
@@ -178,6 +189,27 @@ export function QaPipeline() {
     }
   }
 
+  async function runImport() {
+    if (!importText.trim()) return;
+    setImportBusy(true);
+    try {
+      const data = await jsonFetch("/api/qa-pipeline/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: importText }),
+      });
+      setInput(data.story);
+      setNeedsPack(false);
+      setImportOpen(false);
+      setImportText("");
+      toast.success("Ticket converted to a story — review and run");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Import failed");
+    } finally {
+      setImportBusy(false);
+    }
+  }
+
   async function rename(title: string) {
     if (!active) return;
     try {
@@ -236,6 +268,9 @@ export function QaPipeline() {
           <Button onClick={startRun} disabled={busyNew || !input.trim()}>
             {busyNew ? "Running…" : "Run"}
           </Button>
+          <Button variant="outline" onClick={() => setImportOpen(true)} disabled={busyNew}>
+            Import from ticket
+          </Button>
           <Button
             variant="outline"
             onClick={() => {
@@ -248,6 +283,30 @@ export function QaPipeline() {
           </Button>
         </div>
       </div>
+
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import from a ticket</DialogTitle>
+            <DialogDescription>
+              Paste a raw Jira/GitHub issue or requirement. Gemma extracts a clean user story and
+              acceptance criteria into the box for you to review before running.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            rows={8}
+            value={importText}
+            onChange={(e) => setImportText(e.target.value)}
+            placeholder="Paste the ticket title, description, acceptance criteria…"
+            disabled={importBusy}
+          />
+          <DialogFooter>
+            <Button onClick={runImport} disabled={importBusy || !importText.trim()}>
+              {importBusy ? "Converting…" : "Extract story"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {needsPack && (
         <Card className="mt-6 border-dashed">
