@@ -30,6 +30,9 @@ cockpit/projects/
 .idea/
 .vscode/
 
+# local agent/harness state (scheduled-task locks, etc.) — never commit
+.claude/
+
 # build
 dist/
 build/

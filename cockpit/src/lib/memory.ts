@@ -70,6 +70,10 @@ export async function rankFacts(opts: {
         OR: [{ projectId: null }, ...(opts.projectId ? [{ projectId: opts.projectId }] : [])],
       },
       orderBy: [{ pinned: "desc" }, { createdAt: "asc" }],
+      // Bound the brute-force scan/parse if the corpus ever balloons. Pinned
+      // facts sort first so they're always inside the cap; the result is sliced
+      // to `limit` (<=50) anyway, so this is a no-op at today's scale.
+      take: 200,
       select: {
         id: true,
         key: true,
