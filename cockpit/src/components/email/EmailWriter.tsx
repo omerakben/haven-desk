@@ -55,7 +55,7 @@ export function EmailWriter() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">✉️ Email Writer</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Email Writer</h1>
       <p className="mt-1 text-muted-foreground">Compose or reply to emails with local Gemma.</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">

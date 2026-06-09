@@ -21,7 +21,7 @@ export function Brainstorm({ techniques }: { techniques: Technique[] }) {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">💡 Brainstorming</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Brainstorming</h1>
       <p className="mt-1 text-muted-foreground">
         Pick a thinking technique and run it on your topic. Results save as ideas.
       </p>

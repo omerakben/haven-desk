@@ -19,7 +19,7 @@ export default async function ActivityPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">🕓 Activity</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Activity</h1>
       <p className="mt-1 text-muted-foreground">
         A timeline of what happened in your cockpit — captures, QA runs, quick-adds.
       </p>

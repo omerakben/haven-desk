@@ -65,7 +65,7 @@ export function InboxTool() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">📥 Smart Inbox</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Smart Inbox</h1>
       <p className="mt-1 text-muted-foreground">
         Drop a file or paste anything. Gherkin goes to the QA pipeline; everything else is sorted
         into a task, fact, or idea automatically.

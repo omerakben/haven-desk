@@ -272,7 +272,7 @@ export function QaPipeline() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">🧪 QA Pipeline</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">QA Pipeline</h1>
       <p className="mt-1 text-muted-foreground">
         Paste a user story. The active project supplies the QA context (Gherkin standards, eval
         rubric, glossary); this drafts a <code>.feature</code>, runs the deterministic lint, and

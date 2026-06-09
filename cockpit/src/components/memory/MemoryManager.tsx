@@ -339,7 +339,7 @@ export function MemoryManager({
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">🧠 Memory</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Memory</h1>
       <p className="mt-1 text-muted-foreground">
         Facts about you and your work, woven into the email, brainstorming, task, and QA tools. The
         model proposes; you approve. Facts are ranked by relevance to each task.

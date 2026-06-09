@@ -54,7 +54,7 @@ export function GherkinLinter() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">🧪 Gherkin Lint</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Gherkin Lint</h1>
       <p className="mt-1 text-muted-foreground">
         Check a .feature for BDD hygiene: standard tags, one event per scenario, business-level
         language (no UI/selector/SQL leakage), and the {"{Type} [name]"} entity convention. Runs

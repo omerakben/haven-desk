@@ -1,23 +1,13 @@
 import Link from "next/link";
+
 import { prisma } from "@/lib/db";
 import { HealthBanner } from "@/components/HealthBanner";
 import { DailyBrief } from "@/components/DailyBrief";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { FEATURED_TOOLS } from "@/lib/nav";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const TOOLS = [
-  { href: "/tools/prompt-optimizer", title: "✨ Prompt Optimizer", desc: "Sharpen a rough prompt." },
-  { href: "/tools/prompt-library", title: "📚 Prompt Library", desc: "Saved prompts + variable templates." },
-  { href: "/tools/email-writer", title: "✉️ Email Writer", desc: "Compose and reply with the right tone." },
-  { href: "/tools/brainstorm", title: "💡 Brainstorming", desc: "Structured thinking techniques." },
-  { href: "/tools/image", title: "🖼️ Image", desc: "Ask Gemma about an image." },
-  { href: "/tools/tasks", title: "✅ Tasks", desc: "List + Kanban with AI assists." },
-  { href: "/tools/gherkin-lint", title: "🧪 Gherkin Lint", desc: "Check .feature files for BDD hygiene." },
-  { href: "/tools/memory", title: "🧠 Memory", desc: "Facts woven into your tools." },
-  { href: "/tools/projects", title: "📂 Projects", desc: "Group work; deep-link to Open WebUI." },
-];
 
 export default async function Dashboard() {
   let recent: { id: string; title: string }[] = [];
@@ -32,11 +22,9 @@ export default async function Dashboard() {
   }
 
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">Welcome back, Ozzy</h1>
-      <p className="mt-1 text-muted-foreground">
-        Your local AI cockpit. Everything runs on this machine.
-      </p>
+    <div className="mx-auto max-w-4xl">
+      <h1 className="text-2xl font-semibold tracking-tight">Welcome back, Ozzy</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Your local AI cockpit. Everything runs on this machine.</p>
 
       <div className="mt-6">
         <HealthBanner />
@@ -46,44 +34,40 @@ export default async function Dashboard() {
         <DailyBrief />
       </div>
 
-      <h2 className="mt-8 text-sm font-medium text-muted-foreground">Tools</h2>
-      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {TOOLS.map((t) => (
-          <Link key={t.href} href={t.href}>
-            <Card className="h-full transition-shadow hover:shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{t.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">{t.desc}</CardContent>
-            </Card>
-          </Link>
-        ))}
-        <Card className="h-full border-dashed">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base text-muted-foreground">💬 Open WebUI</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            Chat, documents &amp; RAG — open it from the sidebar.
-          </CardContent>
-        </Card>
+      <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-muted-foreground">Tools</h2>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {FEATURED_TOOLS.map((t) => {
+          const Icon = t.icon;
+          return (
+            <Link key={t.href} href={t.href} className="group">
+              <Card className="h-full transition-colors hover:border-foreground/20 hover:bg-accent/40">
+                <CardContent className="flex items-start gap-3 p-4">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:text-foreground">
+                    <Icon className="h-[18px] w-[18px]" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium leading-tight">{t.label}</div>
+                    <div className="mt-1 text-xs leading-snug text-muted-foreground">{t.desc}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-sm font-medium text-muted-foreground">Recent prompts</h2>
-        {recent.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">
-            None yet — optimize your first prompt.
-          </p>
-        ) : (
+      {recent.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Recent prompts</h2>
           <ul className="mt-2 space-y-1">
             {recent.map((p) => (
-              <li key={p.id} className="text-sm">
-                • {p.title}
+              <li key={p.id} className="truncate text-sm text-foreground/80">
+                {p.title}
               </li>
             ))}
           </ul>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

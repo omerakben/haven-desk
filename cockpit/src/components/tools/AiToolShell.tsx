@@ -54,7 +54,7 @@ export function AiToolShell({
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">{title}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
       {description && <p className="mt-1 text-muted-foreground">{description}</p>}
 
       <Textarea

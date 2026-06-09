@@ -169,7 +169,7 @@ export function PromptLibrary({
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-2xl font-semibold">Prompt Library</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Prompt Library</h1>
       <p className="mt-1 text-muted-foreground">
         Saved prompts and reusable variable templates.
       </p>

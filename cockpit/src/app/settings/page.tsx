@@ -14,7 +14,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
       <p className="mt-1 text-muted-foreground">
         Local engine configuration. These override the environment defaults.
       </p>

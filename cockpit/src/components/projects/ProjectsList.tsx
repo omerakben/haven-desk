@@ -45,7 +45,7 @@ export function ProjectsList({ projects }: { projects: ProjectRow[] }) {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">📂 Projects</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
       <p className="mt-1 text-muted-foreground">
         Group prompts, tasks, ideas, drafts, and memory by project. Pick the active project in the
         sidebar so new work is filed automatically.

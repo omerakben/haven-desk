@@ -67,7 +67,7 @@ export function BugReportTool() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">🐞 Bug Report Writer</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Bug Report Writer</h1>
       <p className="mt-1 text-muted-foreground">
         Paste a rough note. Gemma drafts a structured report (repro, expected, actual, severity) using
         your project vocabulary, and gates it on completeness before saving.

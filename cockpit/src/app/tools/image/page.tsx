@@ -41,7 +41,7 @@ export default function ImagePage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">🖼️ Image (vision)</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Image</h1>
       <p className="mt-1 text-muted-foreground">Ask local Gemma about an image. Nothing leaves your machine.</p>
 
       <div className="mt-6 space-y-4">

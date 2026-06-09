@@ -52,7 +52,7 @@ export function ProjectHubEditor({ project }: { project: EditableProject }) {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold">{project.name}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
         <div className="flex gap-2">
           {owuiUrl && (
             <Button variant="outline" size="sm" asChild>

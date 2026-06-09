@@ -201,7 +201,7 @@ export function TasksView({ initialTasks }: { initialTasks: Task[] }) {
 
   return (
     <div className="max-w-5xl">
-      <h1 className="text-2xl font-semibold">✅ Tasks</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Tasks</h1>
       <p className="mt-1 text-muted-foreground">
         Plan as a list or a board. Drag cards to reorder and move across columns.
       </p>
