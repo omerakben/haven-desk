@@ -215,6 +215,28 @@ model Project {
   tasks     Task[]
   facts     MemoryFact[]
   qaSessions QaSession[]
+  adrs      Adr[]
+}
+
+// Dev tools: a saved Architecture Decision Record — the MADR markdown plus its
+// deterministic lint gate (lintAdr) at save time. Lint counts are denormalized
+// for list badges; the issue list is recomputed on demand (deterministic).
+model Adr {
+  id        String   @id @default(cuid())
+  title     String
+  note      String? // the original decision note that produced the draft
+  markdown  String // the MADR document
+  status    String   @default("proposed") // proposed | accepted | rejected | deprecated | superseded
+  lintOk    Boolean  @default(false)
+  errors    Int      @default(0)
+  warnings  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
 }
 
 // Structured bug report, drafted from a rough note (chatJson) and gated on

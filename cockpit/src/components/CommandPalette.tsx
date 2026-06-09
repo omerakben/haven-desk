@@ -19,6 +19,7 @@ const NAV: { label: string; href: string; keywords?: string }[] = [
   { label: "Image", href: "/tools/image", keywords: "vision photo" },
   { label: "Tasks", href: "/tools/tasks", keywords: "todo kanban board" },
   { label: "Gherkin Lint", href: "/tools/gherkin-lint", keywords: "bdd feature" },
+  { label: "ADR Writer", href: "/tools/adr", keywords: "decision record madr architecture" },
   { label: "QA Pipeline", href: "/tools/qa-pipeline", keywords: "story rubric test" },
   { label: "Memory", href: "/tools/memory", keywords: "facts glossary" },
   { label: "Projects", href: "/tools/projects", keywords: "hub" },
