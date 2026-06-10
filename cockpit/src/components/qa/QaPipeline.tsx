@@ -35,7 +35,7 @@ async function jsonFetch(url: string, init?: RequestInit) {
   return data;
 }
 
-export function QaPipeline() {
+export function QaPipeline({ initialSessionId = null }: { initialSessionId?: string | null }) {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [loadingList, setLoadingList] = useState(true);
   const [active, setActive] = useState<Session | null>(null);
@@ -122,13 +122,18 @@ export function QaPipeline() {
   }, []);
 
   // Initial load (inlined per the repo pattern: async + cancellation guard, so
-  // no setState runs synchronously in the effect body).
+  // no setState runs synchronously in the effect body). A ⌘K deep link
+  // (?session=…) opens that session directly.
   useEffect(() => {
     let active = true;
     (async () => {
       try {
         const data = await jsonFetch("/api/qa-pipeline");
         if (active) setSessions(data.sessions as SessionSummary[]);
+        if (active && initialSessionId) {
+          const s = await jsonFetch(`/api/qa-pipeline/${initialSessionId}`).catch(() => null);
+          if (active && s?.session) setActive(s.session as Session);
+        }
       } catch {
         /* non-fatal */
       } finally {
@@ -138,7 +143,7 @@ export function QaPipeline() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [initialSessionId]);
 
   // Replace one iteration inside the active session.
   const replaceIteration = (it: Iteration) =>

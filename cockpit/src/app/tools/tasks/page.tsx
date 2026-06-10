@@ -14,7 +14,12 @@ const asStatus = (s: string): Task["status"] =>
 const asPriority = (p: string): Task["priority"] =>
   (PRIORITIES as readonly string[]).includes(p) ? (p as Task["priority"]) : "medium";
 
-export default async function TasksPage() {
+export default async function TasksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
   const activeProjectId = await getActiveProjectId();
   const [rows, activeProjectRow] = await Promise.all([
     prisma.task
@@ -43,5 +48,5 @@ export default async function TasksPage() {
     projectName: t.project?.name ?? null,
   }));
 
-  return <TasksView initialTasks={tasks} activeProject={activeProjectRow} />;
+  return <TasksView initialTasks={tasks} activeProject={activeProjectRow} initialQuery={q ?? ""} />;
 }

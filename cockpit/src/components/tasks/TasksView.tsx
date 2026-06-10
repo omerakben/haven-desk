@@ -69,10 +69,13 @@ function group(tasks: Task[]): Board {
 export function TasksView({
   initialTasks,
   activeProject,
+  initialQuery = "",
 }: {
   initialTasks: Task[];
   /** The active project (from the sidebar switcher); enables project scoping. */
   activeProject?: { id: string; name: string } | null;
+  /** Seed for the search box (the ⌘K search deep link: /tools/tasks?q=…). */
+  initialQuery?: string;
 }) {
   const [board, setBoard] = useState<Board>(() => group(initialTasks));
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -85,7 +88,7 @@ export function TasksView({
   // ---- search + filter (client-side, instant — like the Memory page) ----
   // Priority/module filters and the board/list tab survive reloads
   // (localStorage); the search box stays ephemeral by design.
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [priorityRaw, setPriorityFilter] = usePersisted("sk:tasks:priority", "all");
   const [moduleRaw, setModuleFilter] = usePersisted("sk:tasks:module", "all");
   const [view, setView] = usePersisted("sk:tasks:view", "board");

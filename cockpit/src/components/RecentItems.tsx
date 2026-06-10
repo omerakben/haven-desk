@@ -44,18 +44,35 @@ export function RecentItems({
   deleteBase,
   editBase,
   editFields,
+  searchable = false,
+  highlightId = null,
 }: {
   heading: string;
   items: RecentItem[];
   deleteBase: string;
   editBase?: string;
   editFields?: EditField[];
+  /** Show a client-side search box over title + body + badges. */
+  searchable?: boolean;
+  /** Ring + scroll to this item (the ⌘K search deep link). */
+  highlightId?: string | null;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState<RecentItem | null>(null);
+  const [query, setQuery] = useState("");
   const canEdit = !!editBase && !!editFields && editFields.length > 0;
 
   if (items.length === 0) return null;
+
+  const q = query.trim().toLowerCase();
+  const visible = q
+    ? items.filter(
+        (it) =>
+          it.title.toLowerCase().includes(q) ||
+          it.body.toLowerCase().includes(q) ||
+          (it.badges ?? []).some((b) => b.toLowerCase().includes(q))
+      )
+    : items;
 
   async function remove(id: string) {
     const res = await fetch(`${deleteBase}/${id}`, { method: "DELETE" });
@@ -69,10 +86,34 @@ export function RecentItems({
 
   return (
     <div className="mt-8">
-      <h2 className="text-sm font-medium text-muted-foreground">{heading}</h2>
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="text-sm font-medium text-muted-foreground">{heading}</h2>
+        {searchable && items.length > 3 && (
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search…"
+            aria-label={`Search ${heading.toLowerCase()}`}
+            className="h-8 max-w-[200px]"
+          />
+        )}
+      </div>
+      {visible.length === 0 && (
+        <p className="mt-2 text-sm text-muted-foreground">No matches.</p>
+      )}
       <div className="mt-2 space-y-2">
-        {items.map((it) => (
-          <Card key={it.id}>
+        {visible.map((it) => (
+          <Card
+            key={it.id}
+            ref={
+              it.id === highlightId
+                ? (el) => {
+                    el?.scrollIntoView({ block: "center" })
+                  }
+                : undefined
+            }
+            className={it.id === highlightId ? "ring-2 ring-ring" : undefined}
+          >
             <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 py-3">
               <CardTitle className="flex flex-wrap items-center gap-2 text-sm">
                 {it.title}

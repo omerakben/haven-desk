@@ -120,11 +120,14 @@ export function MemoryManager({
   trashed,
   projects,
   activeProjectId,
+  initialSearch = "",
 }: {
   facts: Fact[];
   trashed: TrashedFact[];
   projects: { id: string; name: string }[];
   activeProjectId: string | null;
+  /** Seed for the search box (the ⌘K search deep link: /tools/memory?q=…). */
+  initialSearch?: string;
 }) {
   const activeProjectName = projects.find((p) => p.id === activeProjectId)?.name ?? null;
   const router = useRouter();
@@ -147,7 +150,7 @@ export function MemoryManager({
     filterCategoryRaw === ALLCAT || filterCategoryRaw === UNCAT || CATEGORY_ORDER.includes(filterCategoryRaw)
       ? filterCategoryRaw
       : ALLCAT;
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   // Bulk selection — ACTIVE facts only. Accepting pending/merge facts stays a
   // per-fact human decision by design; bulk ops here are archive/trash only.
   const [selected, setSelected] = useState<Set<string>>(new Set());

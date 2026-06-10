@@ -1,12 +1,9 @@
-import { mkdir, writeFile } from "fs/promises";
-import { join } from "path";
-import { randomUUID } from "crypto";
-
 import { prisma } from "@/lib/db";
 import { describeImage } from "@/lib/vision";
 import { readCaptureToken, tokenMatches } from "@/lib/captureAuth";
 import { embedDocuments, serializeVector } from "@/lib/embeddings";
 import { logActivity } from "@/lib/activity";
+import { saveDataUrlImage } from "@/lib/uploads";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,19 +15,6 @@ const MAX_IMAGE_CHARS = 20 * 1024 * 1024;
 async function getToken(): Promise<string | null> {
   const s = await prisma.settings.findUnique({ where: { id: "singleton" } }).catch(() => null);
   return s?.captureToken || null;
-}
-
-/** Persist a data:image/* URL under cockpit/uploads/, returning its relative path. */
-async function saveCaptureImage(dataUrl: string): Promise<string | null> {
-  const m = dataUrl.match(/^data:image\/([a-zA-Z0-9.+-]+);base64,(.+)$/s);
-  if (!m) return null;
-  const ext = m[1].toLowerCase() === "jpeg" ? "jpg" : m[1].toLowerCase();
-  const buf = Buffer.from(m[2], "base64");
-  const dir = join(process.cwd(), "uploads");
-  await mkdir(dir, { recursive: true });
-  const file = `${randomUUID()}.${ext}`;
-  await writeFile(join(dir, file), buf);
-  return `uploads/${file}`;
 }
 
 /**
@@ -72,7 +56,7 @@ export async function POST(req: Request) {
 
   // Image capture → Idea with a vision description + the saved file path.
   if (hasImage) {
-    const imagePath = await saveCaptureImage(image as string);
+    const imagePath = await saveDataUrlImage(image as string);
     if (!imagePath) {
       return Response.json({ error: "Unsupported image format." }, { status: 400 });
     }
