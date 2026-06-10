@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/db";
 import { assertOllamaReady } from "@/lib/health";
 import { getActiveProjectId } from "@/lib/project";
@@ -104,7 +106,8 @@ export async function POST(req: Request) {
           lintOk: lint.ok,
           errors: lint.summary.errors,
           warnings: lint.summary.warnings,
-          score: rubric,
+          // null = scoring failed but the draft survived; renders as STALE.
+          score: rubric ?? Prisma.DbNull,
         },
       },
     },

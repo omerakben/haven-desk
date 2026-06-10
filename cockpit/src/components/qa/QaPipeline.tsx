@@ -17,9 +17,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { QaSessionView } from "@/components/qa/QaSessionView";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import type { Iteration, Session, SessionSummary } from "@/components/qa/types";
+
+type BenchResult = { id: string; expected: string; got: string; agree: boolean; story: string };
+type Golden = { id: string; story: string; expectedVerdict: string };
 
 const EXAMPLE = `As a cashier, I want to make a walk-in cash sale of in-stock items tax-exempt at the point of sale, so a tax-exempt customer is charged correctly.
 The sale must record the tax-exemption reason, and an over-tender must return the right change.`;
@@ -42,7 +46,14 @@ export function QaPipeline() {
   const [importText, setImportText] = useState("");
   const [importBusy, setImportBusy] = useState(false);
   const [benchBusy, setBenchBusy] = useState(false);
-  const [bench, setBench] = useState<{ total: number; agree: number; agreementPct: number | null } | null>(null);
+  const [bench, setBench] = useState<{
+    total: number;
+    agree: number;
+    agreementPct: number | null;
+    results?: BenchResult[];
+  } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<SessionSummary | null>(null);
+  const [goldens, setGoldens] = useState<Golden[] | null>(null);
 
   async function runBench() {
     setBenchBusy(true);
@@ -62,6 +73,42 @@ export function QaPipeline() {
       toast.error(e instanceof Error ? e.message : "Bench failed");
     } finally {
       setBenchBusy(false);
+    }
+  }
+
+  // ── Golden-case manager (the bench's input set; human-labeled) ────────────
+  async function toggleGoldens() {
+    if (goldens) {
+      setGoldens(null);
+      return;
+    }
+    try {
+      const data = await jsonFetch("/api/qa-pipeline/golden");
+      setGoldens(data.cases as Golden[]);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't load goldens");
+    }
+  }
+
+  async function relabelGolden(id: string, expectedVerdict: "PASS" | "BLOCK") {
+    try {
+      await jsonFetch(`/api/qa-pipeline/golden/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expectedVerdict }),
+      });
+      setGoldens((gs) => gs?.map((g) => (g.id === id ? { ...g, expectedVerdict } : g)) ?? null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Relabel failed");
+    }
+  }
+
+  async function deleteGolden(id: string) {
+    try {
+      await jsonFetch(`/api/qa-pipeline/golden/${id}`, { method: "DELETE" });
+      setGoldens((gs) => gs?.filter((g) => g.id !== id) ?? null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Delete failed");
     }
   }
 
@@ -362,6 +409,9 @@ export function QaPipeline() {
         <Button size="sm" variant="outline" onClick={runBench} disabled={benchBusy}>
           {benchBusy ? "Running…" : "Run eval bench"}
         </Button>
+        <Button size="sm" variant="ghost" onClick={toggleGoldens}>
+          {goldens ? "Hide goldens" : "Manage goldens"}
+        </Button>
         {bench && bench.agreementPct !== null && (
           <span className="text-sm text-muted-foreground">
             {bench.agree}/{bench.total} goldens agree ·{" "}
@@ -375,6 +425,68 @@ export function QaPipeline() {
         Save a session as a golden (story + verdict), then re-run the rubric over all goldens to catch
         drift after a prompt or model change.
       </p>
+
+      {/* Per-case results: a drop in agreement is only actionable if you can see
+          WHICH golden disagreed — and an engine ERROR must not read as drift. */}
+      {bench && bench.results && bench.results.length > 0 && (
+        <div className="mt-3 overflow-x-auto rounded-md border border-border">
+          <table className="w-full text-xs">
+            <thead className="bg-muted text-muted-foreground">
+              <tr>
+                <th className="px-2 py-1.5 text-left font-medium">Golden</th>
+                <th className="px-2 py-1.5 text-left font-medium">Expected</th>
+                <th className="px-2 py-1.5 text-left font-medium">Got</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bench.results.map((r) => (
+                <tr key={r.id} className="border-t border-border">
+                  <td className="max-w-[280px] truncate px-2 py-1.5">{r.story}</td>
+                  <td className="px-2 py-1.5">{r.expected}</td>
+                  <td className="px-2 py-1.5">
+                    <Badge
+                      variant={r.agree ? "secondary" : r.got === "ERROR" || r.got === "UNKNOWN" ? "outline" : "destructive"}
+                      className="text-[10px]"
+                    >
+                      {r.got === "ERROR" ? "ERROR (engine)" : r.got}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {goldens && (
+        <div className="mt-3 space-y-2">
+          {goldens.length === 0 ? (
+            <EmptyState title="No golden cases yet" hint="Save one from a session or accept eval cases." />
+          ) : (
+            goldens.map((g) => (
+              <div key={g.id} className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm">
+                <span className="min-w-0 flex-1 truncate">{g.story}</span>
+                <div className="flex shrink-0 items-center gap-1">
+                  {(["PASS", "BLOCK"] as const).map((v) => (
+                    <Button
+                      key={v}
+                      size="sm"
+                      variant={g.expectedVerdict === v ? "secondary" : "ghost"}
+                      className="h-7 px-2 text-xs"
+                      onClick={() => g.expectedVerdict !== v && relabelGolden(g.id, v)}
+                    >
+                      {v}
+                    </Button>
+                  ))}
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => deleteGolden(g.id)}>
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       <div className="mt-8">
         <h2 className="text-sm font-medium text-muted-foreground">Saved sessions</h2>
@@ -412,7 +524,7 @@ export function QaPipeline() {
                       )}
                     </div>
                   </button>
-                  <Button size="sm" variant="ghost" onClick={() => deleteSessionById(s.id)}>
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(s)}>
                     Delete
                   </Button>
                 </CardContent>
@@ -421,6 +533,20 @@ export function QaPipeline() {
           </div>
         )}
       </div>
+
+      {/* Same cascade as the in-session delete — same confirmation gate. */}
+      <ConfirmDialog
+        open={confirmDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDelete(null);
+        }}
+        title={`Delete "${confirmDelete?.title ?? ""}"?`}
+        description="The story and every iteration in this session are deleted. This can't be undone."
+        onConfirm={() => {
+          if (confirmDelete) deleteSessionById(confirmDelete.id);
+          setConfirmDelete(null);
+        }}
+      />
     </div>
   );
 }

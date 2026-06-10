@@ -101,7 +101,9 @@ export async function POST(req: Request) {
         { role: "user", content: body.spec.trim() },
       ],
       SCHEMA,
-      { model: cfg.model, baseUrl: cfg.baseUrl, temperature: 0.4 }
+      // Same model the bench will later judge with (qaModel override) — cases
+      // drafted on one tier and judged on another skews adversarial quality.
+      { model: cfg.qaModel ?? cfg.model, baseUrl: cfg.baseUrl, temperature: 0.4 }
     );
     cases = out.cases ?? [];
   } catch (e) {

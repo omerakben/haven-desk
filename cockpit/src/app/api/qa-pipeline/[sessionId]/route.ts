@@ -90,7 +90,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ session
       lintOk: lint.ok,
       errors: lint.summary.errors,
       warnings: lint.summary.warnings,
-      score: rubric,
+      // null = scoring failed but the revision survived; renders as STALE.
+      score: rubric ?? Prisma.DbNull,
     },
     select: ITERATION_SELECT,
   });
