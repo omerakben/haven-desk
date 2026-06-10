@@ -58,6 +58,9 @@ export function EvalCaseGenerator() {
     setError(null);
     setResult(null);
     setAccepted({});
+    // Overrides are keyed by case INDEX — kept across a regenerate they'd
+    // relabel whatever case lands at that index and corrupt saved goldens.
+    setVerdictOverrides({});
     setSecs(0);
     const startedAt = Date.now();
     timer.current = setInterval(() => setSecs(Math.round((Date.now() - startedAt) / 1000)), 500);

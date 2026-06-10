@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { assertOllamaReady } from "@/lib/health";
 import { getActiveProjectId } from "@/lib/project";
-import { isRoutine, runRoutine, ROUTINES } from "@/lib/routines";
+import { EMPTY_BOARD_ERROR, isRoutine, runRoutine, ROUTINES } from "@/lib/routines";
 import { readCaptureToken, tokenMatches } from "@/lib/captureAuth";
 
 export const runtime = "nodejs";
@@ -40,6 +40,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     const result = await runRoutine(slug, projectId);
     return Response.json(result);
   } catch (e) {
-    return Response.json({ error: e instanceof Error ? e.message : "Routine failed." }, { status: 500 });
+    const message = e instanceof Error ? e.message : "Routine failed.";
+    // An empty board is a user state (same 400 as /api/tasks/standup), not a server error.
+    return Response.json({ error: message }, { status: message === EMPTY_BOARD_ERROR ? 400 : 500 });
   }
 }

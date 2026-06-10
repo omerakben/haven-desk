@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -97,6 +97,20 @@ export function TasksView({
   // changed nothing here. "All projects" is one click and persisted.
   const [scopeRaw, setScope] = usePersisted("sk:tasks:scope", "project");
   const scope: "project" | "all" = scopeRaw === "all" ? "all" : "project";
+
+  // A ⌘K deep link must actually reveal its target: useState ignores a new
+  // initialQuery once mounted, and /api/search matches across ALL projects, so
+  // lift the persisted filters/scope that could mask the result.
+  useEffect(() => {
+    if (!initialQuery) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven deep-link consume
+    setQuery(initialQuery);
+    setPriorityFilter("all");
+    setModuleFilter("all");
+    setScope("all");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- usePersisted setters are not memoized
+  }, [initialQuery]);
+
   const clearFilters = () => {
     setQuery("");
     setPriorityFilter("all");

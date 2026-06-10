@@ -28,6 +28,11 @@ export async function POST(req: Request) {
       return Response.json({ error: "Image too large (max ~15 MB)." }, { status: 413 });
     }
     imagePath = await saveDataUrlImage(image);
+    // Same contract as capture: a data:image we can't parse is a 400, not a
+    // silent imagePath:null that loses the image behind a 200.
+    if (!imagePath) {
+      return Response.json({ error: "Unsupported image format." }, { status: 400 });
+    }
   }
   const projectId = await getActiveProjectId();
   const t = typeof title === "string" && title.trim() ? title.trim().slice(0, 120) : null;

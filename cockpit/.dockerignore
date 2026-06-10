@@ -1,10 +1,12 @@
 node_modules
 .next
 .git
-*.db
-*.db-journal
-*.db-wal
-*.db-shm
+# **/ matters: dockerignore globs are root-anchored, and the local-dev SQLite
+# lives at prisma/dev.db — a bare *.db left it baked into the image layers.
+**/*.db
+**/*.db-journal
+**/*.db-wal
+**/*.db-shm
 data
 .env
 .env.*

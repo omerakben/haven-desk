@@ -31,6 +31,10 @@ function bullets<T>(rows: T[], pick: (r: T) => string | null): string {
 export const STANDUP_SYSTEM =
   "Write a brief daily standup from a task board: three short sections — 'In progress', 'Up next' (top 3), 'Recently done'. Concise, no preamble.";
 
+// An empty board is a normal user state, not a failure — routes map this
+// message to a 400, anything else to a 500.
+export const EMPTY_BOARD_ERROR = "No tasks to summarize yet.";
+
 /**
  * The one standup board builder (shared by the streamed /api/tasks/standup and
  * the headless routine). Scoped to a project when given, bounded per section,
@@ -81,18 +85,22 @@ export async function runRoutine(
 
   if (slug === "standup") {
     const board = await buildStandupBoard(projectId);
-    if (!board) throw new Error("No tasks to summarize yet.");
+    if (!board) throw new Error(EMPTY_BOARD_ERROR);
     system = STANDUP_SYSTEM;
     prompt = board;
     title = `Standup ${ymd(today)}`;
   } else {
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
+    // Same scope as the standup board: the resulting Idea is stamped with
+    // projectId, so the content must be active-project + global — unscoped
+    // queries filed other projects' completions under the active one.
+    const scope = projectId ? { OR: [{ projectId: null }, { projectId }] } : {};
     const [done, sessions, captures] = await Promise.all([
-      prisma.task.findMany({ where: { completedAt: { gte: today, lt: tomorrow } }, select: { title: true } }),
-      prisma.qaSession.findMany({ where: { updatedAt: { gte: today, lt: tomorrow } }, select: { title: true } }),
+      prisma.task.findMany({ where: { ...scope, completedAt: { gte: today, lt: tomorrow } }, select: { title: true } }),
+      prisma.qaSession.findMany({ where: { ...scope, updatedAt: { gte: today, lt: tomorrow } }, select: { title: true } }),
       prisma.activityLog.findMany({
-        where: { createdAt: { gte: today, lt: tomorrow } },
+        where: { ...scope, createdAt: { gte: today, lt: tomorrow } },
         orderBy: { createdAt: "desc" },
         take: 30,
         select: { summary: true },

@@ -115,7 +115,12 @@ export function InboxTool() {
         <VoiceTextarea
           rows={10}
           value={text}
-          onValueChange={setText}
+          onValueChange={(v) => {
+            setText(v);
+            // The verdict and line numbers describe the text they linted —
+            // editing invalidates both.
+            setLint(null);
+          }}
           placeholder="Drop a .feature / .txt / .md / .csv here, or paste text…"
           textareaClassName="border-0 focus-visible:ring-0"
           disabled={busy}

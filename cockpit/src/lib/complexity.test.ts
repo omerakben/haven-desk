@@ -176,4 +176,23 @@ describe("withGrowthWarnings", () => {
     expect(growth[0].message).toMatch(/O\(n\^3\)/);
     expect(growth[0].line).toBe(120); // new-file line of the function header
   });
+
+  it("does not blame growth on context lines a one-line edit didn't introduce", () => {
+    // The 3-deep loops arrive as unchanged context; only `use(...)` is added.
+    // A growth WARN here pins O(n^3) on code the diff didn't touch.
+    const rows = [
+      " function hot(xs) {",
+      "   for (const a of xs) {",
+      "     for (const b of xs) {",
+      "       for (const c of xs) {",
+      "+        use(a, b, c);",
+      "       }",
+      "     }",
+      "   }",
+      " }",
+    ];
+    const diff = `--- a/f.ts\n+++ b/f.ts\n@@ -1,8 +1,9 @@\n` + rows.join("\n") + "\n";
+    const out = withGrowthWarnings(scanCode(diff), diff);
+    expect(out.issues.filter((i) => i.rule === "growth")).toHaveLength(0);
+  });
 });

@@ -244,6 +244,14 @@ describe("detectForeignLanguage + language guard", () => {
   it("does not flag normal TS", () => {
     expect(detectForeignLanguage(`const x = (a: number) => a + 1;`)).toBeNull();
   });
+
+  it("does not flag TS `end` properties/assignments as Ruby", () => {
+    // Everyday TS — this very lib has an `end: number;` field. Only a bare
+    // `end` line (a Ruby block terminator) is a tell.
+    expect(detectForeignLanguage(`type Span = {\n  start: number;\n  end: number;\n};`)).toBeNull();
+    expect(detectForeignLanguage(`let end = 0;\nend = i + 1;`)).toBeNull();
+    expect(detectForeignLanguage(`def total(orders)\n  orders.sum\nend`)).toBe("Ruby");
+  });
 });
 
 describe("magic-number allowlist", () => {

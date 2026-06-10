@@ -3,7 +3,7 @@ import { AlertTriangle, CalendarClock, Loader2, Brain, CheckCircle2 } from "luci
 
 import { prisma } from "@/lib/db";
 import { getActiveProjectId } from "@/lib/project";
-import { dueDayString, localDayString } from "@/lib/dates";
+import { dueDayString, localDayString, utcNoonOfLocalDay } from "@/lib/dates";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type TaskLite = { id: string; title: string };
@@ -39,11 +39,16 @@ export async function DailyBrief() {
     // One query for everything with a due date that could matter today; the
     // overdue/due-today split happens on CALENDAR DAYS (lib/dates.ts), not raw
     // instants — a UTC-midnight-stored task is not "overdue" on its due day.
+    // Bounded by DATE (anything representable as ≤ today, legacy rows
+    // included), not by row count — a take-N ascending window filled with 50+
+    // overdue rows used to silently starve the due-today bucket.
     settle(
       prisma.task.findMany({
-        where: { ...scope, status: { not: "done" }, dueDate: { not: null } },
-        orderBy: { dueDate: "asc" },
-        take: 50,
+        where: { ...scope, status: { not: "done" }, dueDate: { lt: utcNoonOfLocalDay(new Date(), 2) } },
+        // desc: today's rows are the LATEST in range, so they can never be cut
+        // by the take; overdue then lists nearest-due first.
+        orderBy: { dueDate: "desc" },
+        take: 200,
         select: { id: true, title: true, dueDate: true },
       }),
       [] as (TaskLite & { dueDate: Date | null })[]

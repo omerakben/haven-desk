@@ -41,7 +41,10 @@ const FOREIGN_TELLS: { re: RegExp; lang: string }[] = [
   { re: /\bpublic\s+(static\s+)?(void|class|final)\b/, lang: "Java/C#" },
   { re: /^\s*package\s+[\w.]+\s*$/m, lang: "Go" },
   { re: /^\s*fn\s+\w+\s*(<[^>]*>)?\(.*\)\s*(->|\{)/m, lang: "Rust" },
-  { re: /^\s*(elif|end)\b/m, lang: "Python/Ruby" },
+  { re: /^\s*elif\b/m, lang: "Python" },
+  // Bare `end` on its own line only — `end: number;` / `end = i` are everyday
+  // TS (this file has one) and used to mislabel a correct scan as Ruby.
+  { re: /^\s*end\s*$/m, lang: "Ruby" },
 ];
 
 /** Detect a paste that's clearly not TS/JS. Returns the language name or null. */

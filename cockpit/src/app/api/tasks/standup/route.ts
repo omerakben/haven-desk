@@ -1,7 +1,7 @@
 import { assertOllamaReady } from "@/lib/health";
 import { streamTextResponse } from "@/lib/ai/streamRoute";
 import { getActiveProjectId } from "@/lib/project";
-import { buildStandupBoard, STANDUP_SYSTEM } from "@/lib/routines";
+import { buildStandupBoard, EMPTY_BOARD_ERROR, STANDUP_SYSTEM } from "@/lib/routines";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export async function POST() {
   const projectId = await getActiveProjectId();
   const board = await buildStandupBoard(projectId);
   if (!board) {
-    return Response.json({ error: "No tasks to summarize yet." }, { status: 400 });
+    return Response.json({ error: EMPTY_BOARD_ERROR }, { status: 400 });
   }
 
   return streamTextResponse({

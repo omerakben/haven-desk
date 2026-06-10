@@ -35,8 +35,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   // active fact and drops the proposal. This is the only path that edits an
   // existing active fact, and it runs only on an explicit accept.
   if (body.status === "active") {
+    // deletedAt:null — a trashed proposal was already rejected by the human;
+    // accepting it would edit an active fact and hard-delete a restorable row.
     const fact = await prisma.memoryFact
-      .findUnique({ where: { id }, select: { id: true, value: true, mergedIntoId: true, projectId: true } })
+      .findFirst({ where: { id, deletedAt: null }, select: { id: true, value: true, mergedIntoId: true, projectId: true } })
       .catch(() => null);
     if (fact?.mergedIntoId) {
       try {
@@ -57,7 +59,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const data: Record<string, unknown> = {};
   if (STATUS.includes(body.status ?? "")) data.status = body.status;
   if (typeof body.pinned === "boolean") data.pinned = body.pinned;
-  if (typeof body.value === "string") data.value = body.value.trim();
+  if (typeof body.value === "string") {
+    const value = body.value.trim();
+    // POST rejects empty facts; PATCH must too — a blanked value would also
+    // skip the re-embed below and keep ranking the fact by its old meaning.
+    if (!value) return Response.json({ error: "Value can't be empty." }, { status: 400 });
+    data.value = value;
+  }
   if (typeof body.key === "string") data.key = body.key.trim() || null;
   if (typeof body.category === "string") data.category = normalizeCategory(body.category);
   if ("projectId" in body) {
@@ -88,6 +96,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
   }
 
+  // "accepted" must mean the pending → active flip specifically — the Archived
+  // section's restore button also sends {status:"active"}.
+  let wasPending = false;
+  if (data.status === "active") {
+    const prev = await prisma.memoryFact.findUnique({ where: { id }, select: { status: true } }).catch(() => null);
+    wasPending = prev?.status === "pending";
+  }
+
   // Guard against soft-deleted rows: a generic PATCH must not silently
   // re-status a fact that's sitting in the Trash (only `restore` targets those).
   const updated = await prisma.memoryFact
@@ -98,7 +114,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
   const fact = await prisma.memoryFact.findUnique({ where: { id } });
   // A pending → active flip is the human accept — the loop's key event.
-  if (data.status === "active" && fact) {
+  if (data.status === "active" && wasPending && fact) {
     await logActivity({
       entity: "fact",
       action: "accepted",

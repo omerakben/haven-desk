@@ -166,6 +166,17 @@ export function withGrowthWarnings(result: SmellResult, code: string): SmellResu
     } else {
       for (const hunk of parseDiffHunks(code)) {
         if (hunk.added.size === 0) continue; // pure deletions can't add growth
+        // The diff must INTRODUCE iteration somewhere: a one-line edit inside
+        // an existing 3-deep loop arrives with the loops as context lines, and
+        // warning on those blames growth the change didn't add.
+        const fragmentLines = hunk.fragment.split("\n");
+        const addsIteration = [...hunk.added].some((l) => {
+          const line = fragmentLines[l - 1] ?? "";
+          LOOP_KEYWORD.lastIndex = 0;
+          ITERATION_METHOD.lastIndex = 0;
+          return LOOP_KEYWORD.test(line) || ITERATION_METHOD.test(line);
+        });
+        if (!addsIteration) continue;
         collectGrowthWarnings(
           scanComplexity(hunk.fragment),
           (l) => hunk.map[l - 1] ?? l,

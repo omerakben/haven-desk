@@ -30,8 +30,18 @@ export function CaptureSetup() {
     toast.success("New token generated");
   }
 
+  // The test command must target THIS server — on the Docker stack that's
+  // :3000, but a local `npm run dev` port differs and a hardcoded URL fails.
+  // (The Shortcut recipes below stay on :3000: they target the long-running
+  // stack, not a dev server.) Effect-set so SSR and first paint agree.
+  const [origin, setOrigin] = useState("http://localhost:3000");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time external read (window.location)
+    setOrigin(window.location.origin);
+  }, []);
+
   const curl = token
-    ? `curl -X POST http://localhost:3000/api/capture \\\n  -H "x-capture-token: ${token}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"target":"task","text":"Buy milk"}'`
+    ? `curl -X POST ${origin}/api/capture \\\n  -H "x-capture-token: ${token}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"target":"task","text":"Buy milk"}'`
     : "Loading…";
 
   return (

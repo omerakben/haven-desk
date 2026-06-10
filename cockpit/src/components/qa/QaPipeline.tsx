@@ -400,11 +400,16 @@ export function QaPipeline({ initialSessionId = null }: { initialSessionId?: str
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
               The active project is missing its Gherkin-authoring and eval-rubric templates (and
-              glossary facts). Seed a pack, then switch to that project and run again:
+              glossary facts). If you have a project pack locally, seed it and switch to that
+              project:
             </p>
             <pre className="overflow-x-auto rounded-md border border-border bg-muted p-3 font-mono text-xs text-foreground">
               npm run seed:lbmh
             </pre>
+            <p>
+              No pack? Packs are private and not in the repo — but Gherkin Lint and the Rubric
+              Designer work standalone, no pack needed.
+            </p>
           </CardContent>
         </Card>
       )}

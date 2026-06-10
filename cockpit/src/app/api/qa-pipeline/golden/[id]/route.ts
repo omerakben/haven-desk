@@ -20,8 +20,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       select: { id: true, expectedVerdict: true },
     });
     return Response.json(c);
-  } catch {
-    return Response.json({ error: "Golden case not found." }, { status: 404 });
+  } catch (e) {
+    // Only "no such row" is a 404; a real DB error mid-relabel must not read
+    // as the case not existing (a silently failed relabel skews the bench).
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
+      return Response.json({ error: "Golden case not found." }, { status: 404 });
+    }
+    return Response.json({ error: "Couldn't relabel the golden case." }, { status: 500 });
   }
 }
 
