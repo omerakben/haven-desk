@@ -1,0 +1,46 @@
+# Swiss Knife — recommended Codex baseline for this repo (team reference)
+#
+# IMPORTANT: Codex does NOT auto-load this file. The `codex` CLI reads
+# ~/.codex/config.toml (CODEX_HOME) only; a project-level .codex/config.toml
+# is not picked up just by running codex in this directory (verified).
+# This file is the *documented baseline* for working on Swiss Knife.
+#
+# To adopt it, either:
+#   a) merge the keys below into your own ~/.codex/config.toml, or
+#   b) copy it to a Codex profile and select it per run:
+#        cp .codex/config.toml ~/.codex/swiss-knife.config.toml
+#        codex -p swiss-knife
+#
+# Defaults here are intentionally conservative: a shared baseline should not
+# hand every teammate a no-prompt, full-network agent. Opt into more autonomy
+# in YOUR OWN global config if you want it (sandbox_mode = "danger-full-access",
+# approval_policy = "never"). No secrets belong in this committed file.
+
+# GPT 5.5 at extra-high reasoning — the coding partner that works alongside Claude.
+model                  = "gpt-5.5"
+model_reasoning_effort = "xhigh"
+
+# Safe shared baseline: Codex edits/runs inside the repo, network off,
+# asks before escalating. (Personal full access goes in ~/.codex/config.toml.)
+sandbox_mode    = "workspace-write"
+approval_policy = "on-request"
+
+# --- MCP servers (minimal, secret-free, version-pinned) ---
+
+# Version-accurate library docs (Next.js 15, Prisma, Tailwind, shadcn).
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@3.1.0"]
+startup_timeout_sec = 20.0
+tool_timeout_sec = 120.0
+
+# Browser checks for the cockpit UI (pairs with `npm run test:e2e`).
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.75"]
+
+# Opt-in: uncomment to give Codex the GitHub MCP.
+# Needs CODEX_GITHUB_PERSONAL_ACCESS_TOKEN in the environment — never inline a token here.
+# [mcp_servers.github]
+# url = "https://api.githubcopilot.com/mcp/"
+# bearer_token_env_var = "CODEX_GITHUB_PERSONAL_ACCESS_TOKEN"
