@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { assertOllamaReady } from "@/lib/health";
+import { getEffectiveConfig } from "@/lib/config";
 import { getActiveProjectId } from "@/lib/project";
 import { logActivity } from "@/lib/activity";
 import {
@@ -83,7 +84,9 @@ export async function POST(req: Request) {
     return Response.json({ projectId, needsPack: true });
   }
 
-  const notReady = await assertOllamaReady();
+  // Gate on the model the pipeline actually runs (the qaModel override when set).
+  const cfg = await getEffectiveConfig();
+  const notReady = await assertOllamaReady(cfg.qaModel ?? undefined);
   if (notReady) return notReady;
 
   let iteration;

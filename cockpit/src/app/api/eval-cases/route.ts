@@ -81,7 +81,9 @@ export async function POST(req: Request) {
   }
 
   // ── Generate path: model drafts → coverage gate → embedding dedupe. ──
-  const notReady = await assertOllamaReady();
+  // Gate on the model generation actually uses (qaModel override when set).
+  const cfg = await getEffectiveConfig();
+  const notReady = await assertOllamaReady(cfg.qaModel ?? undefined);
   if (notReady) return notReady;
 
   if (!body.spec || typeof body.spec !== "string" || !body.spec.trim()) {
@@ -91,7 +93,6 @@ export async function POST(req: Request) {
     return Response.json({ error: "That's too long — paste a focused spec." }, { status: 413 });
   }
 
-  const cfg = await getEffectiveConfig();
   let cases: EvalCase[];
   try {
     // chatJson = structured extraction: NO memory injection (perf rule).
