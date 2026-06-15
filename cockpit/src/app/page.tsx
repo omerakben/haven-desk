@@ -42,8 +42,8 @@ export default async function Dashboard() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-semibold tracking-tight">{greeting(userName)}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Your local AI cockpit. Everything runs on this machine.</p>
+      <h1 className="text-3xl font-semibold tracking-tight">{greeting(userName)}</h1>
+      <p className="mt-1.5 text-[15px] text-muted-foreground">Your local AI cockpit. Everything runs on this machine.</p>
 
       <div className="mt-6">
         <HealthBanner />

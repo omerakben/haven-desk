@@ -60,18 +60,18 @@ export function SidebarNav() {
     return (
       <div
         key={t.href}
-        className={"group flex items-center rounded-md " + (active ? "bg-accent" : "hover:bg-accent/60")}
+        className={"group flex items-center rounded-lg transition-colors " + (active ? "bg-primary/10" : "hover:bg-accent/60")}
       >
         <Link
           href={t.href}
           aria-current={active ? "page" : undefined}
           className={
             "flex min-w-0 flex-1 items-center gap-2.5 px-2.5 py-1.5 text-sm " +
-            (active ? "font-medium text-accent-foreground" : "text-foreground/70 group-hover:text-foreground")
+            (active ? "font-medium text-primary" : "text-foreground/70 group-hover:text-foreground")
           }
         >
           <Icon
-            className={"h-4 w-4 shrink-0 " + (active ? "" : "text-muted-foreground group-hover:text-foreground")}
+            className={"h-4 w-4 shrink-0 " + (active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")}
           />
           <span className="truncate">{t.label}</span>
         </Link>

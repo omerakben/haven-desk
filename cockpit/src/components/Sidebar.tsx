@@ -24,8 +24,10 @@ export default async function Sidebar() {
   const content = (
     <>
       <div className="flex items-center justify-between px-4 py-3.5">
-        <span className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-          <Wrench className="h-[18px] w-[18px] text-muted-foreground" />
+        <span className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <Wrench className="h-[15px] w-[15px]" />
+          </span>
           Swiss Knife
         </span>
         <ThemeToggle />
@@ -51,7 +53,7 @@ export default async function Sidebar() {
       <MobileSidebar>{content}</MobileSidebar>
       <aside
         aria-label="Sidebar"
-        className="hidden w-60 shrink-0 flex-col border-r border-border bg-card md:flex"
+        className="hidden w-60 shrink-0 flex-col border-r border-border/70 glass md:flex"
       >
         {content}
       </aside>

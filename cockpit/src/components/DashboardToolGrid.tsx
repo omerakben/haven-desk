@@ -33,9 +33,9 @@ export function DashboardToolGrid() {
         const Icon = t.icon;
         return (
           <Link key={t.href} href={t.href} className="group">
-            <Card className="h-full transition-colors hover:border-foreground/20 hover:bg-accent/40">
+            <Card className="h-full border-border/70 transition-[transform,box-shadow,border-color] duration-200 ease-apple group-hover:-translate-y-0.5 group-hover:border-border group-hover:shadow-md">
               <CardContent className="flex items-start gap-3 p-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:text-foreground">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
                   <Icon className="h-[18px] w-[18px]" />
                 </div>
                 <div className="min-w-0">

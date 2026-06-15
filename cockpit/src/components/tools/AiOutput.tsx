@@ -28,7 +28,7 @@ export function AiOutput({
         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           {label}
           {streaming && (
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-foreground/60" />
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" />
           )}
         </CardTitle>
         <div className="flex items-center gap-1">

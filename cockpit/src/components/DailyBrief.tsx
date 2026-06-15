@@ -98,7 +98,7 @@ export async function DailyBrief() {
           </p>
         ) : clear ? (
           <p className="flex items-center gap-2 text-muted-foreground">
-            <CheckCircle2 className="h-4 w-4 text-green-600" /> You&apos;re clear — nothing overdue or due today.
+            <CheckCircle2 className="h-4 w-4 text-success" /> You&apos;re clear — nothing overdue or due today.
           </p>
         ) : (
           <>

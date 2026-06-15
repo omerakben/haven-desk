@@ -411,8 +411,8 @@ export function CommandPalette() {
                 onClick={() => run(it)}
                 onMouseMove={() => setActive(i)}
                 className={
-                  "flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm " +
-                  (i === active ? "bg-accent text-accent-foreground" : "")
+                  "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors " +
+                  (i === active ? "bg-primary/10 text-foreground" : "text-foreground/80")
                 }
               >
                 <span className="flex-1 truncate">

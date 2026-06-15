@@ -59,7 +59,7 @@ export function HealthBanner({
   if (health.ok) {
     if (!showWhenOk) return null;
     return (
-      <Alert>
+      <Alert variant="success">
         <CheckCircle2 className="h-4 w-4" />
         <AlertTitle>Engine ready</AlertTitle>
         <AlertDescription>
