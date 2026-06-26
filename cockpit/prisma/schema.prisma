@@ -287,6 +287,7 @@ model ActivityLog {
 model Settings {
   id           String   @id @default("singleton")
   userName     String? // greeting personalization; null = generic greeting
+  persona      String? // first-run persona pick (household | small-business | student | creative | personal-admin | skipped)
   model        String?
   qaModel      String? // optional model for the QA pipeline (rigor); falls back to `model`
   temperature  Float?
