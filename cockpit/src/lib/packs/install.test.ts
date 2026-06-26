@@ -7,7 +7,7 @@ describe("buildInstallPlan", () => {
   it("maps a pack's content to upsert specs keyed by slug/sourceKey", () => {
     const plan = buildInstallPlan(smallBusinessOpsPack, null);
     expect(plan.packSlug).toBe("small-business-ops");
-    expect(plan.counts).toEqual({ templates: 3, facts: 2, tasks: 2 });
+    expect(plan.counts).toEqual({ templates: 6, facts: 2, tasks: 2 });
     expect(plan.templates.map((t) => t.slug)).toContain("sbo-meeting-notes-to-tasks");
     expect(plan.facts.map((f) => f.sourceKey)).toContain("sbo-fact-tone");
     expect(plan.tasks.map((t) => t.sourceKey)).toContain("sbo-task-setup-project");
