@@ -16,6 +16,12 @@ import {
   Smile,
   Briefcase,
   SpellCheck,
+  Scissors,
+  Lightbulb,
+  CheckSquare,
+  Megaphone,
+  MessageSquareHeart,
+  Luggage,
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
@@ -45,6 +51,12 @@ const ICONS: Record<string, LucideIcon> = {
   Smile,
   Briefcase,
   SpellCheck,
+  Scissors,
+  Lightbulb,
+  CheckSquare,
+  Megaphone,
+  MessageSquareHeart,
+  Luggage,
 };
 
 export function QuickActions({ initialActionId }: { initialActionId: string | null }) {

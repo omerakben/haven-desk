@@ -186,6 +186,79 @@ export const QUICK_ACTIONS: QuickAction[] = [
     system: "You fix spelling and grammar while keeping the writer's voice. Return only the corrected text.",
     buildPrompt: (i) => `Fix the spelling and grammar in this. Keep my voice and meaning, and return only the corrected text:\n\n${v(i, "text")}`,
   },
+  {
+    id: "make-shorter",
+    title: "Make this shorter",
+    blurb: "Trim it down without losing the point.",
+    category: "improve",
+    icon: "Scissors",
+    inputs: [{ name: "text", label: "Paste your text", type: "textarea", placeholder: "Paste the long version…" }],
+    system: "You make text shorter and tighter while keeping the meaning and tone. Return only the shortened text.",
+    buildPrompt: (i) => `Make this shorter and tighter without losing the main point or changing the tone:\n\n${v(i, "text")}`,
+  },
+  {
+    id: "explain-simply",
+    title: "Explain this simply",
+    blurb: "Turn jargon or a hard passage into plain language.",
+    category: "organize",
+    icon: "Lightbulb",
+    inputs: [{ name: "text", label: "Paste the text", type: "textarea", placeholder: "A confusing email, a clause, a term…" }],
+    system: "You explain things in plain, simple language anyone can understand.",
+    buildPrompt: (i) => `Explain this in plain, simple language, as if to a friend with no background in it:\n\n${v(i, "text")}`,
+  },
+  {
+    id: "find-action-items",
+    title: "Find the action items",
+    blurb: "Pull the to-dos out of an email or thread.",
+    category: "organize",
+    icon: "CheckSquare",
+    inputs: [{ name: "text", label: "Paste the email or thread", type: "textarea", placeholder: "Paste it here…" }],
+    system: "You find the action items hidden in a message or thread.",
+    buildPrompt: (i) =>
+      `Read this and list only the action items (things someone needs to do), one per line starting with a dash. If there are none, say so:\n\n${v(i, "text")}`,
+  },
+  {
+    id: "social-post",
+    title: "Write a social post",
+    blurb: "A short, engaging post from a quick idea.",
+    category: "write",
+    icon: "Megaphone",
+    inputs: [
+      { name: "topic", label: "What's it about?", type: "textarea", placeholder: "Describe it in a sentence or two…" },
+      { name: "vibe", label: "Tone or vibe", type: "text", placeholder: "e.g. excited, professional, funny", optional: true },
+    ],
+    system: "You write short, engaging social media posts. Return only the post.",
+    buildPrompt: (i) =>
+      `Write a short social post about: ${v(i, "topic")}.${v(i, "vibe") ? ` Tone: ${v(i, "vibe")}.` : ""} Keep it punchy and natural.`,
+  },
+  {
+    id: "apology",
+    title: "Draft an apology",
+    blurb: "A sincere, clear apology message.",
+    category: "write",
+    icon: "MessageSquareHeart",
+    inputs: [
+      { name: "to", label: "Who is it to?", type: "text", placeholder: "e.g. a customer, a friend" },
+      { name: "what", label: "What happened?", type: "textarea", placeholder: "Describe it briefly…" },
+    ],
+    system: "You write sincere, clear apologies that take responsibility without over-explaining. Return only the message.",
+    buildPrompt: (i) =>
+      `Write a sincere apology to ${v(i, "to")}. What happened: ${v(i, "what")}. Take responsibility, keep it brief, and offer to make it right if appropriate.`,
+  },
+  {
+    id: "packing-list",
+    title: "Make a packing list",
+    blurb: "A practical packing list for a trip.",
+    category: "plan",
+    icon: "Luggage",
+    inputs: [
+      { name: "trip", label: "Where and what kind of trip?", type: "text", placeholder: "e.g. 4 days in Chicago for work" },
+      { name: "notes", label: "Anything else?", type: "text", placeholder: "e.g. it'll be cold, bringing a laptop", optional: true },
+    ],
+    system: "You make practical, well-organized packing lists.",
+    buildPrompt: (i) =>
+      `Make a practical packing list for: ${v(i, "trip")}.${v(i, "notes") ? ` Notes: ${v(i, "notes")}.` : ""} Group it into sections and keep it realistic.`,
+  },
 ];
 
 export function getQuickAction(id: string): QuickAction | undefined {
