@@ -19,6 +19,14 @@ export type QuickInput = {
 // A one-tap example: a short label plus inputs that fill the form and run for real.
 export type QuickActionExample = { label: string; inputs: Record<string, string> };
 
+// The Smart Inbox is a starter target too; its single textarea is the "text" field.
+export const INBOX_TARGET = "inbox";
+export const INBOX_FIELD = "text";
+
+// A built-in starter: the seed source for the editable Starter rows (lib/starters.ts).
+// `key` is the stable sourceKey; `target` is a QuickAction id or INBOX_TARGET.
+export type BuiltinStarter = { target: string; key: string; label: string; inputs: Record<string, string> };
+
 export type QuickAction = {
   id: string;
   title: string;
@@ -276,136 +284,97 @@ export const QUICK_ACTIONS: QuickAction[] = [
   },
 ];
 
-// Examples live in one block (rather than inline on each action) so they're easy
-// to scan and edit. Each fills its action's inputs and is validated by the tests.
-// They're attached to the actions at module load.
-const EXAMPLES: Record<string, QuickActionExample[]> = {
-  "reply-to-message": [
-    {
-      label: "School bake sale",
-      inputs: {
-        message:
-          "Hi! We'd love to have you join the school bake sale committee. Our first meeting is this Wednesday at 6pm in the library. Can you make it?",
-        intent: "happy to help but I can't do Wednesdays, ask if there's another day",
-      },
-    },
-  ],
-  "polite-message": [
-    {
-      label: "Ask the landlord",
-      inputs: { to: "my landlord", about: "the kitchen tap has been dripping for a week and I'd like someone to look at it" },
-    },
-  ],
-  "thank-you-note": [{ label: "A birthday gift", inputs: { who: "Aunt Mary", for: "the lovely birthday scarf" } }],
-  "notes-to-list": [
-    {
-      label: "A meeting brain-dump",
-      inputs: {
-        notes:
-          "call the printer about the proofs, Sam owes me the quote, book the venue for the 12th, follow up with Dana, order more business cards",
-      },
-    },
-  ],
-  summarize: [
-    {
-      label: "A long email",
-      inputs: {
-        text:
-          "Hi team, following our review we've decided to push the launch to next month to give QA more time. Marketing should hold the announcement. Finance flagged that the vendor invoice is overdue. Please confirm your availability for a sync on Thursday and send updated timelines by end of day Friday. Thanks.",
-      },
-    },
-  ],
-  "key-points": [
-    {
-      label: "A wordy update",
-      inputs: {
-        text:
-          "So basically the project is going okay but we hit a snag with the API, the client wants more features which will push the timeline, the team is a bit stretched, and we need to decide on hosting before next week or we'll be blocked.",
-      },
-    },
-  ],
-  "plan-week": [
-    {
-      label: "A busy week",
-      inputs: {
-        plate:
-          "finish the proposal, dentist on Tuesday, kids' recital Thursday, taxes due Friday, hit the gym, call mom, grocery shop, fix the leaky tap",
-      },
-    },
-  ],
-  "meal-plan": [
-    { label: "Quick vegetarian", inputs: { preferences: "vegetarian, quick weeknight dinners, no mushrooms", days: "5" } },
-  ],
-  "study-plan": [{ label: "A cert exam", inputs: { topic: "the AWS Solutions Architect exam", deadline: "in 3 weeks" } }],
-  "make-friendlier": [
-    { label: "A blunt note", inputs: { text: "I need the report by tomorrow. Don't be late this time." } },
-  ],
-  "make-professional": [
-    {
-      label: "A casual message",
-      inputs: { text: "hey so i can't make the call thing tomorrow, something came up, can we do it another time maybe?" },
-    },
-  ],
-  "fix-writing": [
-    {
-      label: "Typos & grammar",
-      inputs: {
-        text: "Their going to send the documents tommorow, i seen the email but its not arrived yet. Please could you check you're inbox.",
-      },
-    },
-  ],
-  "make-shorter": [
-    {
-      label: "Trim a paragraph",
-      inputs: {
-        text:
-          "I wanted to reach out and let you know that, after giving it quite a lot of thought and consideration over the past few days, I've come to the conclusion that it would probably be best for everyone involved if we went ahead and rescheduled the meeting to a later date.",
-      },
-    },
-  ],
-  "explain-simply": [
-    {
-      label: "Legal jargon",
-      inputs: {
-        text:
-          "The lessee shall indemnify and hold harmless the lessor from any and all liabilities, claims, or damages arising from the lessee's use of the premises, except those resulting from the lessor's gross negligence.",
-      },
-    },
-  ],
-  "find-action-items": [
-    {
-      label: "An email thread",
-      inputs: {
-        text:
-          "Thanks all. Priya, can you send the updated deck by Wednesday? I'll book the room. We still need someone to follow up with the vendor, Tom can you take that? And let's all review the budget before Friday's call.",
-      },
-    },
-  ],
-  "social-post": [
-    {
-      label: "A product launch",
-      inputs: {
-        topic: "we just launched a local-first AI app that keeps your data on your own computer",
-        vibe: "excited but down-to-earth",
-      },
-    },
-  ],
-  apology: [
-    {
-      label: "A late delivery",
-      inputs: { to: "a customer", what: "their order shipped three days late because of a warehouse mix-up" },
-    },
-  ],
-  "packing-list": [
-    {
-      label: "A work trip",
-      inputs: { trip: "4 days in Chicago for a conference", notes: "it'll be cold, bringing a laptop, one nice dinner" },
-    },
-  ],
-};
+// The shipped standard starters: the seed source for the editable Starter rows
+// (lib/starters.ts). A re-seed is create-only, so an edit is never clobbered.
+// Flat with a stable `key` (the sourceKey). 2–3 on the high-value everyday
+// actions, one on the rest, plus a few Smart Inbox (target: "inbox") starters.
+export const BUILTIN_STARTERS: BuiltinStarter[] = [
+  // reply-to-message
+  { target: "reply-to-message", key: "reply-to-message:bake-sale", label: "School bake sale",
+    inputs: { message: "Hi! We'd love to have you join the school bake sale committee. Our first meeting is this Wednesday at 6pm in the library. Can you make it?", intent: "happy to help but I can't do Wednesdays, ask if there's another day" } },
+  { target: "reply-to-message", key: "reply-to-message:reschedule", label: "Reschedule a call",
+    inputs: { message: "Are we still on for our call tomorrow at 2pm?", intent: "yes, but I need to push it to 3pm — apologize for the short notice" } },
+  { target: "reply-to-message", key: "reply-to-message:decline", label: "Politely decline",
+    inputs: { message: "Would you be able to volunteer at the fundraiser this weekend?", intent: "I can't make it this time but I'd love to help with the next one" } },
+  // polite-message
+  { target: "polite-message", key: "polite-message:landlord", label: "Ask the landlord",
+    inputs: { to: "my landlord", about: "the kitchen tap has been dripping for a week and I'd like someone to look at it" } },
+  { target: "polite-message", key: "polite-message:teacher", label: "Message a teacher",
+    inputs: { to: "my child's teacher", about: "my son will miss Thursday for a doctor's appointment; ask for the homework he'll need" } },
+  // thank-you-note
+  { target: "thank-you-note", key: "thank-you-note:gift", label: "A birthday gift",
+    inputs: { who: "Aunt Mary", for: "the lovely birthday scarf" } },
+  // notes-to-list
+  { target: "notes-to-list", key: "notes-to-list:brain-dump", label: "A meeting brain-dump",
+    inputs: { notes: "call the printer about the proofs, Sam owes me the quote, book the venue for the 12th, follow up with Dana, order more business cards" } },
+  { target: "notes-to-list", key: "notes-to-list:errands", label: "Weekend errands",
+    inputs: { notes: "groceries, pick up dry cleaning, return the package, call the plumber, water the plants, charge the car" } },
+  // summarize
+  { target: "summarize", key: "summarize:long-email", label: "A long email",
+    inputs: { text: "Hi team, following our review we've decided to push the launch to next month to give QA more time. Marketing should hold the announcement. Finance flagged that the vendor invoice is overdue. Please confirm your availability for a sync on Thursday and send updated timelines by end of day Friday. Thanks." } },
+  { target: "summarize", key: "summarize:article", label: "An article",
+    inputs: { text: "Researchers found that short, frequent breaks during focused work improved retention more than one long break. The effect was strongest for complex material and weakest for routine tasks. They recommend a five-minute pause roughly every half hour, away from screens." } },
+  // key-points
+  { target: "key-points", key: "key-points:wordy-update", label: "A wordy update",
+    inputs: { text: "So basically the project is going okay but we hit a snag with the API, the client wants more features which will push the timeline, the team is a bit stretched, and we need to decide on hosting before next week or we'll be blocked." } },
+  // plan-week
+  { target: "plan-week", key: "plan-week:busy", label: "A busy week",
+    inputs: { plate: "finish the proposal, dentist on Tuesday, kids' recital Thursday, taxes due Friday, hit the gym, call mom, grocery shop, fix the leaky tap" } },
+  { target: "plan-week", key: "plan-week:launch", label: "A launch week",
+    inputs: { plate: "finalize the deck, dry-run the demo, send invites, prep the FAQ, line up support coverage, write the announcement, brief the team" } },
+  // meal-plan
+  { target: "meal-plan", key: "meal-plan:vegetarian", label: "Quick vegetarian",
+    inputs: { preferences: "vegetarian, quick weeknight dinners, no mushrooms", days: "5" } },
+  { target: "meal-plan", key: "meal-plan:family", label: "Family of four",
+    inputs: { preferences: "kid-friendly, one sheet-pan night, budget-conscious", days: "7" } },
+  // study-plan
+  { target: "study-plan", key: "study-plan:cert", label: "A cert exam",
+    inputs: { topic: "the AWS Solutions Architect exam", deadline: "in 3 weeks" } },
+  // make-friendlier
+  { target: "make-friendlier", key: "make-friendlier:blunt", label: "A blunt note",
+    inputs: { text: "I need the report by tomorrow. Don't be late this time." } },
+  // make-professional
+  { target: "make-professional", key: "make-professional:casual", label: "A casual message",
+    inputs: { text: "hey so i can't make the call thing tomorrow, something came up, can we do it another time maybe?" } },
+  // fix-writing
+  { target: "fix-writing", key: "fix-writing:typos", label: "Typos & grammar",
+    inputs: { text: "Their going to send the documents tommorow, i seen the email but its not arrived yet. Please could you check you're inbox." } },
+  // make-shorter
+  { target: "make-shorter", key: "make-shorter:paragraph", label: "Trim a paragraph",
+    inputs: { text: "I wanted to reach out and let you know that, after giving it quite a lot of thought and consideration over the past few days, I've come to the conclusion that it would probably be best for everyone involved if we went ahead and rescheduled the meeting to a later date." } },
+  // explain-simply
+  { target: "explain-simply", key: "explain-simply:legal", label: "Legal jargon",
+    inputs: { text: "The lessee shall indemnify and hold harmless the lessor from any and all liabilities, claims, or damages arising from the lessee's use of the premises, except those resulting from the lessor's gross negligence." } },
+  // find-action-items
+  { target: "find-action-items", key: "find-action-items:thread", label: "An email thread",
+    inputs: { text: "Thanks all. Priya, can you send the updated deck by Wednesday? I'll book the room. We still need someone to follow up with the vendor, Tom can you take that? And let's all review the budget before Friday's call." } },
+  // social-post
+  { target: "social-post", key: "social-post:launch", label: "A product launch",
+    inputs: { topic: "we just launched a local-first AI app that keeps your data on your own computer", vibe: "excited but down-to-earth" } },
+  // apology
+  { target: "apology", key: "apology:late-delivery", label: "A late delivery",
+    inputs: { to: "a customer", what: "their order shipped three days late because of a warehouse mix-up" } },
+  // packing-list
+  { target: "packing-list", key: "packing-list:work-trip", label: "A work trip",
+    inputs: { trip: "4 days in Chicago for a conference", notes: "it'll be cold, bringing a laptop, one nice dinner" } },
+  // Smart Inbox starters — fill the textarea with a ready snippet to file.
+  { target: INBOX_TARGET, key: "inbox:meeting-note", label: "A meeting note",
+    inputs: { [INBOX_FIELD]: "Sync with Dana: agreed to ship the proposal Friday, she'll send the budget, I'll follow up with the printer about the proofs." } },
+  { target: INBOX_TARGET, key: "inbox:todo-list", label: "A list of to-dos",
+    inputs: { [INBOX_FIELD]: "call the printer, send the quote to Sam, book the venue for the 12th, order business cards" } },
+  { target: INBOX_TARGET, key: "inbox:remember-fact", label: "A fact to remember",
+    inputs: { [INBOX_FIELD]: "Our tax-exempt number is 12-3456789; the accountant is Priya at Maple & Co." } },
+];
 
+// Group the action-targeted built-ins into the per-action example shape the
+// runner, the attach, and getFeaturedDemo already use (inbox starters excluded).
+const EXAMPLES_BY_ACTION: Record<string, QuickActionExample[]> = {};
+for (const s of BUILTIN_STARTERS) {
+  if (s.target === INBOX_TARGET) continue;
+  (EXAMPLES_BY_ACTION[s.target] ??= []).push({ label: s.label, inputs: s.inputs });
+}
 for (const a of QUICK_ACTIONS) {
-  a.examples = EXAMPLES[a.id] ?? [];
+  a.examples = EXAMPLES_BY_ACTION[a.id] ?? [];
 }
 
 /** The single curated example shown as the featured "see it work" demo on the home. */
