@@ -6,7 +6,6 @@ import {
   Square,
   Search,
   Clock,
-  Play,
   Reply,
   Mail,
   Heart,
@@ -36,6 +35,7 @@ import { usePersisted } from "@/hooks/usePersisted";
 import { Button } from "@/components/ui/button";
 import { AiOutput } from "@/components/tools/AiOutput";
 import { ErrorAlert } from "@/components/ErrorAlert";
+import { StarterChips } from "@/components/StarterChips";
 import {
   QUICK_ACTIONS,
   QUICK_ACTION_CATEGORIES,
@@ -262,26 +262,15 @@ export function QuickActions({ initialActionId }: { initialActionId: string | nu
         </div>
       </div>
 
-      {active.examples && active.examples.length > 0 && (
-        <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-primary" /> See it instantly — tap one to fill and run:
-            </span>
-            {active.examples.map((ex, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => runWith(ex.inputs)}
-                disabled={isRunning}
-                className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-card px-2.5 py-1 text-xs font-medium text-foreground shadow-sm transition-colors hover:border-primary/50 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 disabled:opacity-60"
-              >
-                <Play className="h-3 w-3 text-primary" /> {ex.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <StarterChips
+        key={active.id}
+        target={active.id}
+        fallback={active.examples ?? []}
+        current={values}
+        onPick={(inputs) => runWith(inputs)}
+        editFields={active.inputs.map((i) => ({ name: i.name, label: i.label, type: i.type }))}
+        headline="See it instantly — tap one to fill and run:"
+      />
 
       <div className="mt-6 space-y-4">
         {active.inputs.map((inp) => (
