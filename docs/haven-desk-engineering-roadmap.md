@@ -74,6 +74,8 @@ The app internal name stays `swiss-knife`. No package names, ports, scripts, or 
 
 ### M1: Persona-first information architecture
 
+**Status: Shipped 2026-06-26 (this session).** The nav regrouped to Today / Capture / Write / Documents / Projects / Packs / Settings; all hrefs unchanged, the eight professional QA and dev tools moved under Packs, the empty Documents group is reserved, and nav.test is green. A read-only Packs surface (`/tools/packs`) and a workspace-global pack install (`POST /api/packs/install`, gated by `validatePackManifest`) also shipped as an early slice of M4/M5. Per-project pack install via composite keys is deferred. See CLAUDE.md for detail.
+
 **Goal.** Reshape nav and dashboard groups so a non-technical first-time user sees Today, Capture, Write, Documents, Projects, Packs, and Settings as the top-level structure. QA and developer tools move into a professional pack group, visible but not dominant.
 
 **Dependencies.** M0 (UX IA doc specifies the target group structure and label mapping).
