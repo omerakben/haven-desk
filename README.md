@@ -15,6 +15,28 @@ Everything stays on your machine. No third-party logging.
 
 ---
 
+## Product direction: Haven Desk
+
+`Swiss Knife` is the repo and developer edition. The product direction for a
+wider, non-technical audience is **Haven Desk** — a local-first private AI daily
+runner ("Private AI for the work of daily life"). The repo name, ports, scripts,
+and local-first rules are unchanged; Haven Desk is the public product story plus
+a declarative pack system layered on top.
+
+The strategy, roadmap, and implementation specs live under [`docs/`](docs/README.md):
+
+- [Product narrative](docs/haven-desk-product-narrative.md) — positioning, personas, what it is and is not.
+- [Engineering roadmap](docs/haven-desk-engineering-roadmap.md) — staged milestones with acceptance criteria.
+- [Persona-first UX & IA](docs/haven-desk-ux-information-architecture.md) — target navigation and first-run onboarding.
+- [Plugin & pack spec](docs/haven-desk-plugin-pack-spec.md) — the `PluginManifest` contract and first packs.
+- [Monetization plan](docs/haven-desk-monetization-plan.md) — tiers, packs, pricing, licensing.
+- [Implementation backlog](docs/haven-desk-implementation-backlog.md) — issue-ready tasks.
+
+The pack contract is implemented as a pure, tested validator at
+`cockpit/src/lib/packs/manifest.ts` (see [`docs/README.md`](docs/README.md) for the full index).
+
+---
+
 ## Why Ollama runs natively (not in Docker)
 
 Ollama runs **natively on the host** on every platform; the containers reach it

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { isLocalEngineUrl } from "@/lib/engineUrl";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,6 +13,16 @@ const OWUI_BASE = process.env.OWUI_BASE_URL || "http://localhost:4142";
  * loudly when Open WebUI is unreachable or the key is rejected.
  */
 export async function POST() {
+  // This route POSTs saved prompts to OWUI_BASE with the API key, so an off-machine
+  // URL is a data-exfiltration path. Restrict it to a local host, the same gate the
+  // engine URL uses (lib/engineUrl). A misconfigured OWUI_BASE_URL fails closed.
+  if (!isLocalEngineUrl(OWUI_BASE)) {
+    return Response.json(
+      { error: "Open WebUI sync is restricted to a local URL. Set OWUI_BASE_URL to a loopback host or host.docker.internal." },
+      { status: 500 }
+    );
+  }
+
   const s = await prisma.settings.findUnique({ where: { id: "singleton" } }).catch(() => null);
   const key = s?.owuiApiKey;
   if (!key) {

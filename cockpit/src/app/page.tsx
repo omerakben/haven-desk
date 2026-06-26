@@ -52,39 +52,41 @@ export default async function Dashboard() {
       {firstRun && (
         <Card className="mt-6 border-dashed">
           <CardContent className="p-5">
-            <h2 className="font-semibold">First run? Three things to know</h2>
+            <h2 className="font-semibold">Welcome to Haven Desk</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Private AI for the work of daily life. Three things to know:
+            </p>
             <ol className="mt-3 list-inside list-decimal space-y-2 text-sm text-muted-foreground">
               <li>
-                <span className="font-medium text-foreground">Everything is local.</span> The model,
-                the data, this page — nothing leaves this machine. Run{" "}
-                <code className="rounded bg-muted px-1 py-0.5">./swiss doctor</code> (macOS) or{" "}
-                <code className="rounded bg-muted px-1 py-0.5">.\swiss doctor</code> (Windows) in
-                the repo for a full preflight.
+                <span className="font-medium text-foreground">Everything stays on this machine.</span>{" "}
+                The AI, your notes, and your files never leave your computer. If the engine ever looks
+                off, the banner above tells you the next step in plain language.
               </li>
               <li>
-                <span className="font-medium text-foreground">Projects are optional.</span> With no
-                project selected you work in the global space. Create one under{" "}
-                <Link href="/tools/projects" className="underline underline-offset-2">
-                  Projects
+                <span className="font-medium text-foreground">Start with a pack.</span> A pack sets up
+                a ready-made workflow in one click. Open{" "}
+                <Link href="/tools/packs" className="underline underline-offset-2">
+                  Packs
                 </Link>{" "}
-                to scope memory, tasks, and prompts — and switch any time in the sidebar.
+                and install one (Small Business Ops is a good first pick) to get templates and tasks
+                ready to use.
               </li>
               <li>
-                <span className="font-medium text-foreground">⌘K (Ctrl K on Windows) opens the
-                palette.</span>{" "}
-                Search everything, ask a one-shot question, or quick-add a note from anywhere.
+                <span className="font-medium text-foreground">Capture anything fast.</span> Press ⌘K
+                (Ctrl K on Windows) to search, ask a quick question, or drop a note from anywhere, or
+                paste into{" "}
+                <Link href="/tools/inbox" className="underline underline-offset-2">
+                  Smart Inbox
+                </Link>
+                .
               </li>
             </ol>
             <p className="mt-3 text-sm text-muted-foreground">
-              Good first stop:{" "}
-              <Link href="/tools/prompt-optimizer" className="underline underline-offset-2">
-                Prompt Optimizer
-              </Link>
-              . Set your name and model in{" "}
+              Make it yours in{" "}
               <Link href="/settings" className="underline underline-offset-2">
                 Settings
               </Link>
-              .
+              : add your name, pick the model, choose a theme.
             </p>
           </CardContent>
         </Card>

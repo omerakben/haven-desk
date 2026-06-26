@@ -7,7 +7,7 @@
 services:
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: swissknife-openwebui
+    container_name: havendesk-openwebui
     ports:
       # Dedicated host port (override with OWUI_PORT). Swiss Knife runs all the
       # time, so it stays off the universal dev ports 3000/3001. The container
@@ -17,6 +17,11 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - WEBUI_AUTH=False          # single-user local; set True before sharing externally
       - ENABLE_API_KEYS=True      # needed for the cockpit's prompt sync (default is False; enables Settings → Account → API Keys)
+      # Keep Open WebUI from phoning home — the local-first promise. Upstream ships
+      # anonymized usage telemetry (Scarf/PostHog) on by default; these disable it.
+      - ANONYMIZED_TELEMETRY=False
+      - DO_NOT_TRACK=true
+      - SCARF_NO_ANALYTICS=true
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -25,7 +30,7 @@ services:
 
   cockpit:
     build: ./cockpit
-    container_name: swissknife-cockpit
+    container_name: havendesk-cockpit
     ports:
       # Dedicated host port (override with COCKPIT_PORT). Container still
       # listens on 3000 internally — only the published host port moves.
