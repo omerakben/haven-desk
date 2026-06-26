@@ -38,6 +38,17 @@ export const QUICK_ACTION_CATEGORIES: { id: QuickActionCategory; label: string }
   { id: "improve", label: "Improve my writing" },
 ];
 
+// A soft per-category accent for the icon tiles, so the gallery reads as four
+// kinds of help at a glance instead of one wall of identical blue. Tailwind
+// classes (with dark: variants) rather than theme tokens — these are intentional
+// brand-adjacent accents, kept tasteful and legible in both themes.
+export const CATEGORY_ACCENT: Record<QuickActionCategory, string> = {
+  write: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+  organize: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+  plan: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  improve: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+};
+
 // Values arrive from JSON, so a field can be a non-string (number, array). Treat
 // anything that isn't a string as empty, so the gate and the prompt never throw.
 const v = (inputs: Record<string, string>, name: string) => {
@@ -408,6 +419,35 @@ export function getFeaturedDemo(): { action: QuickAction; example: QuickActionEx
 
 export function getQuickAction(id: string): QuickAction | undefined {
   return QUICK_ACTIONS.find((a) => a.id === id);
+}
+
+/**
+ * Free-text search over the gallery (title, blurb, and the category label), so
+ * a user can type "email" or "list" instead of scanning four sections. An empty
+ * or whitespace query returns every action (the full gallery).
+ */
+export function searchQuickActions(query: string): QuickAction[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return QUICK_ACTIONS;
+  const labelOf = (c: QuickActionCategory) => QUICK_ACTION_CATEGORIES.find((x) => x.id === c)?.label ?? "";
+  return QUICK_ACTIONS.filter((a) => `${a.title} ${a.blurb} ${labelOf(a.category)}`.toLowerCase().includes(q));
+}
+
+/** How many recently-used actions we remember. */
+export const RECENTS_CAP = 5;
+
+/**
+ * Push an action id onto the recents list: most-recent first, de-duplicated
+ * (re-running an action moves it to the front, never adds a second copy), and
+ * capped. Pure so the localStorage glue stays trivial and this stays tested.
+ */
+export function pushRecent(ids: string[], id: string, cap = RECENTS_CAP): string[] {
+  return [id, ...ids.filter((x) => x !== id)].slice(0, cap);
+}
+
+/** Resolve recent ids to actions, dropping any that no longer exist. */
+export function recentActions(ids: string[]): QuickAction[] {
+  return ids.map(getQuickAction).filter((a): a is QuickAction => Boolean(a));
 }
 
 /** Required inputs that are empty (by label), so the UI and route can block a run. */

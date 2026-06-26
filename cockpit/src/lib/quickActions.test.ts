@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { QUICK_ACTIONS, getQuickAction, missingInputs, buildMessages, getFeaturedDemo } from "./quickActions";
+import {
+  QUICK_ACTIONS,
+  getQuickAction,
+  missingInputs,
+  buildMessages,
+  getFeaturedDemo,
+  searchQuickActions,
+  pushRecent,
+  recentActions,
+  RECENTS_CAP,
+} from "./quickActions";
 
 describe("quickActions", () => {
   it("every action has a unique id, at least one input, and a system prompt", () => {
@@ -71,5 +81,34 @@ describe("quickActions", () => {
     expect(f).not.toBeNull();
     expect(f!.action.id).toBeTruthy();
     expect(missingInputs(f!.action, f!.example.inputs)).toEqual([]);
+  });
+
+  it("searchQuickActions returns everything for an empty query and filters on a term", () => {
+    expect(searchQuickActions("")).toHaveLength(QUICK_ACTIONS.length);
+    expect(searchQuickActions("   ")).toHaveLength(QUICK_ACTIONS.length);
+    const replies = searchQuickActions("reply");
+    expect(replies.length).toBeGreaterThan(0);
+    expect(replies.every((a) => `${a.title} ${a.blurb}`.toLowerCase().includes("reply"))).toBe(true);
+    expect(searchQuickActions("zzzz-no-such-thing")).toEqual([]);
+  });
+
+  it("searchQuickActions also matches the category label", () => {
+    // "plan" is a category label; at least the meal/week planners should surface.
+    expect(searchQuickActions("plan").length).toBeGreaterThan(0);
+  });
+
+  it("pushRecent puts the id first, de-dupes, and caps the list", () => {
+    expect(pushRecent([], "a")).toEqual(["a"]);
+    expect(pushRecent(["a", "b"], "b")).toEqual(["b", "a"]); // moves to front, no dup
+    expect(pushRecent(["a", "b"], "c")).toEqual(["c", "a", "b"]);
+    const many = Array.from({ length: RECENTS_CAP }, (_, i) => `x${i}`);
+    expect(pushRecent(many, "new")).toHaveLength(RECENTS_CAP);
+    expect(pushRecent(many, "new")[0]).toBe("new");
+  });
+
+  it("recentActions resolves ids to actions and drops unknown ones", () => {
+    const ids = ["summarize", "does-not-exist", "meal-plan"];
+    const acts = recentActions(ids);
+    expect(acts.map((a) => a.id)).toEqual(["summarize", "meal-plan"]);
   });
 });
