@@ -10,6 +10,9 @@ import {
   pushRecent,
   recentActions,
   RECENTS_CAP,
+  REFINE_OPTIONS,
+  getRefineOption,
+  buildRefineMessages,
 } from "./quickActions";
 
 describe("quickActions", () => {
@@ -110,5 +113,27 @@ describe("quickActions", () => {
     const ids = ["summarize", "does-not-exist", "meal-plan"];
     const acts = recentActions(ids);
     expect(acts.map((a) => a.id)).toEqual(["summarize", "meal-plan"]);
+  });
+
+  it("refine options each have a unique id, a label, and a non-empty instruction", () => {
+    const ids = new Set<string>();
+    for (const r of REFINE_OPTIONS) {
+      expect(r.id).toBeTruthy();
+      expect(ids.has(r.id), `duplicate refine id ${r.id}`).toBe(false);
+      ids.add(r.id);
+      expect(r.label.trim().length).toBeGreaterThan(0);
+      expect(r.instruction.trim().length).toBeGreaterThan(0);
+    }
+    expect(getRefineOption("shorter")?.label).toBe("Shorter");
+    expect(getRefineOption("nope")).toBeUndefined();
+  });
+
+  it("buildRefineMessages embeds the text and the instruction", () => {
+    const msgs = buildRefineMessages("a draft to revise", "Make it shorter.");
+    expect(msgs).toHaveLength(2);
+    expect(msgs[0].role).toBe("system");
+    expect(msgs[1].role).toBe("user");
+    expect(msgs[1].content).toContain("a draft to revise");
+    expect(msgs[1].content).toContain("Make it shorter.");
   });
 });

@@ -38,6 +38,7 @@ import {
   QUICK_ACTIONS,
   QUICK_ACTION_CATEGORIES,
   CATEGORY_ACCENT,
+  REFINE_OPTIONS,
   getQuickAction,
   missingInputs,
   searchQuickActions,
@@ -225,6 +226,13 @@ export function QuickActions({ initialActionId }: { initialActionId: string | nu
     await run("", { actionId: active.id, inputs });
   }
 
+  // One-tap refine: re-run the model over the current result with a plain tweak.
+  // Iterative — the refined text replaces the result, so a second tap refines it.
+  async function refineWith(instruction: string) {
+    if (!output) return;
+    await run("", { refine: { text: output, instruction } });
+  }
+
   return (
     <div className="max-w-3xl">
       <button
@@ -309,6 +317,23 @@ export function QuickActions({ initialActionId }: { initialActionId: string | nu
 
       {error && <ErrorAlert className="mt-4" title="Couldn't run that" message={error} />}
       <AiOutput output={output} status={status} label="Result" />
+
+      {status === "done" && output && (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">Make it:</span>
+          {REFINE_OPTIONS.map((r) => (
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => refineWith(r.instruction)}
+              disabled={isRunning}
+              className="rounded-full border border-border px-2.5 py-1 text-xs transition-colors hover:border-primary/40 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 disabled:opacity-60"
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -450,6 +450,39 @@ export function recentActions(ids: string[]): QuickAction[] {
   return ids.map(getQuickAction).filter((a): a is QuickAction => Boolean(a));
 }
 
+// One-tap refinements on a result: the user got a draft and wants to nudge it
+// without writing a new prompt. Each is a plain-language tweak; the id is what
+// the UI sends, the instruction is what the model is told.
+export type RefineOption = { id: string; label: string; instruction: string };
+
+export const REFINE_OPTIONS: RefineOption[] = [
+  { id: "shorter", label: "Shorter", instruction: "Make it shorter and more concise, keeping the main point." },
+  { id: "friendlier", label: "Friendlier", instruction: "Make it warmer and friendlier in tone." },
+  { id: "formal", label: "More formal", instruction: "Make it more formal and professional in tone." },
+  { id: "simpler", label: "Simpler", instruction: "Use simpler, plainer language that anyone can understand." },
+  { id: "detail", label: "More detail", instruction: "Add a little more helpful detail and specifics." },
+];
+
+export function getRefineOption(id: string): RefineOption | undefined {
+  return REFINE_OPTIONS.find((r) => r.id === id);
+}
+
+/**
+ * Messages to revise an existing result. The model gets the prior text plus a
+ * plain-language instruction and returns ONLY the revised text — so refining is
+ * iterative (refine the refinement) and needs no action context.
+ */
+export function buildRefineMessages(text: string, instruction: string): ChatMessage[] {
+  return [
+    {
+      role: "system",
+      content:
+        "You revise a piece of writing according to the user's instruction. Return ONLY the revised text — no preamble, no commentary, no surrounding quotes.",
+    },
+    { role: "user", content: `Here is the text:\n"""\n${text}\n"""\n\nRevise it: ${instruction}` },
+  ];
+}
+
 /** Required inputs that are empty (by label), so the UI and route can block a run. */
 export function missingInputs(action: QuickAction, inputs: Record<string, string>): string[] {
   return action.inputs.filter((inp) => !inp.optional && !v(inputs, inp.name)).map((inp) => inp.label);
