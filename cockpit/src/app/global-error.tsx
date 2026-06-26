@@ -22,7 +22,7 @@ export default function GlobalError({
       >
         <main style={{ maxWidth: 440, padding: 24, textAlign: "center" }}>
           <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
-            Swiss Knife hit an unexpected error
+            Haven Desk hit an unexpected error
           </h2>
           <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 16 }}>
             The cockpit could not render this view. Try reloading it.

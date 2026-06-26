@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Wrench, X } from "lucide-react";
+import { Menu, ShieldCheck, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -22,8 +22,8 @@ export function MobileSidebar({ children }: { children: React.ReactNode }) {
           <Menu className="h-5 w-5" />
         </Button>
         <span className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-          <Wrench className="h-[18px] w-[18px] text-muted-foreground" />
-          Swiss Knife
+          <ShieldCheck className="h-[18px] w-[18px] text-muted-foreground" />
+          Haven Desk
         </span>
       </div>
 

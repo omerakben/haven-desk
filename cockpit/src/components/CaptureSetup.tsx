@@ -93,7 +93,7 @@ export function CaptureSetup() {
             </code>{" "}
             (the script fetches this token itself, so nothing secret is stored in the Shortcut).
           </li>
-          <li>Name it “Capture to Swiss Knife”.</li>
+          <li>Name it “Capture to Haven Desk”.</li>
           <li>
             Shortcut details (sidebar) → Add Keyboard Shortcut → pick a hotkey (e.g. ⌃⌥⌘C).
           </li>
@@ -138,7 +138,7 @@ export function CaptureSetup() {
           </li>
           <li>
             It saves as an Idea (visible in Brainstorming) with a Gemma description. Assign a
-            hotkey to grab any screen region into Swiss Knife.
+            hotkey to grab any screen region into Haven Desk.
           </li>
         </ol>
       </details>

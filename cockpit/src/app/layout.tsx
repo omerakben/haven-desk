@@ -6,8 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { CommandPalette } from "@/components/CommandPalette";
 
 export const metadata: Metadata = {
-  title: "Swiss Knife",
-  description: "Local AI daily runner powered by Gemma",
+  title: "Haven Desk",
+  description: "Private AI for the work of daily life. Runs locally on your machine.",
   icons: [{ rel: "icon", url: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
 };
 

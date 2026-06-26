@@ -1,4 +1,4 @@
-import { Wrench } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { getActiveProjectId } from "@/lib/project";
@@ -26,9 +26,9 @@ export default async function Sidebar() {
       <div className="flex items-center justify-between px-4 py-3.5">
         <span className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <Wrench className="h-[15px] w-[15px]" />
+            <ShieldCheck className="h-[15px] w-[15px]" />
           </span>
-          Swiss Knife
+          Haven Desk
         </span>
         <ThemeToggle />
       </div>
