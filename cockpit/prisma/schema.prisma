@@ -297,3 +297,21 @@ model Settings {
   owuiApiKey   String? // Open WebUI API key for one-way prompt sync
   updatedAt    DateTime @updatedAt
 }
+
+// User-editable starter (a form pre-fill). target = a QuickAction id or "inbox".
+// Built-in standards are seeded as editable rows (sourceKey set, builtin true)
+// create-only so a re-seed never clobbers an edit; user starters have a null
+// sourceKey. See src/lib/starters.ts + src/lib/quickActions.ts BUILTIN_STARTERS.
+model Starter {
+  id        String   @id @default(cuid())
+  target    String // a QuickAction id (e.g. "reply-to-message") or "inbox"
+  label     String
+  inputs    String   @default("{}") // JSON: field name -> value; inbox uses { "text": "…" }
+  builtin   Boolean  @default(false)
+  order     Float    @default(0)
+  sourceKey String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([target])
+}
