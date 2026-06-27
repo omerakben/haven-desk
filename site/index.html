@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Haven Desk is a local AI desk for small-business follow-through: quick actions, meeting notes, smart inbox, tasks, drafts, packs, and reviewed local workflows."
+    />
+    <title>Haven Desk | Small business early access</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header" data-shell>
+      <a class="brand" href="#top" aria-label="Haven Desk home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <path d="M12 3.2 18.2 5v5.6c0 4.1-2.5 7.8-6.2 9.4-3.7-1.6-6.2-5.3-6.2-9.4V5L12 3.2Z" />
+            <path d="M9.2 12.1 11 13.9l4-4.4" />
+          </svg>
+        </span>
+        <span>Haven Desk</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+        <a href="#product">Product</a>
+        <a href="#quickstart">Quick Start</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#pack">Pack</a>
+        <a class="nav-cta" href="#apply">Apply</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section-pad" id="product">
+        <div class="hero-copy">
+          <p class="overline">Local AI cockpit for small business operators</p>
+          <h1>Haven Desk turns scattered work into reviewed next steps.</h1>
+          <p class="hero-lede">
+            A quiet local workspace for quick actions, meeting notes, smart inbox sorting,
+            tasks, drafts, workflow packs, and Open WebUI handoff. It does not pretend
+            to run your business. You review the output before it becomes useful work.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#apply">Apply for early access</a>
+            <a class="button secondary" href="#workflow">See the daily loop</a>
+          </div>
+          <dl class="truth-strip" aria-label="Verified product facts">
+            <div>
+              <dt>Current app</dt>
+              <dd>Runs on localhost</dd>
+            </div>
+            <div>
+              <dt>Model lane</dt>
+              <dd>Local Gemma 4</dd>
+            </div>
+            <div>
+              <dt>Access</dt>
+              <dd>Approval-first pilots</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="product-shell" aria-label="Sanitized Haven Desk product preview">
+          <div class="window-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+            <strong>Haven Desk</strong>
+          </div>
+          <div class="app-window">
+            <aside class="app-sidebar">
+              <div class="mini-brand">
+                <span class="brand-mark small" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3.2 18.2 5v5.6c0 4.1-2.5 7.8-6.2 9.4-3.7-1.6-6.2-5.3-6.2-9.4V5L12 3.2Z" />
+                    <path d="M9.2 12.1 11 13.9l4-4.4" />
+                  </svg>
+                </span>
+                <span>Haven Desk</span>
+              </div>
+              <button class="project-select" type="button">No project - global</button>
+              <div class="search-box">Search... <kbd>⌘K</kbd></div>
+              <p class="nav-label">Favorites</p>
+              <a>Quick Actions <b></b></a>
+              <a>Prompt Optimizer <b></b></a>
+              <a>Templates <b></b></a>
+              <p class="nav-label">Tools</p>
+              <a class="active">Dashboard</a>
+              <p class="nav-label">Today</p>
+              <a>Tasks</a>
+              <a>Meeting Notes</a>
+              <a>Memory</a>
+              <p class="nav-label">Capture</p>
+              <a>Smart Inbox</a>
+              <a>Image</a>
+              <p class="nav-label">Write</p>
+              <a>Prompt Library</a>
+              <a>Email Writer</a>
+              <a>Brainstorming</a>
+              <p class="sidebar-foot">Powered by local Gemma 4</p>
+            </aside>
+
+            <section class="app-main">
+              <div class="app-topline">
+                <span>Dashboard</span>
+                <span>Open WebUI linked</span>
+              </div>
+              <h2>Pick a quick action below.</h2>
+              <p>Everything stays on this machine. Private task text is omitted from this public preview.</p>
+              <div class="quick-action-grid" aria-label="Actual quick actions visible in Haven Desk">
+                <article><span>↩</span>Reply to a message</article>
+                <article><span>☑</span>Turn notes into a to-do list</article>
+                <article><span>▤</span>Summarize this</article>
+                <article><span>✉</span>Write a polite message</article>
+                <article><span>☺</span>Make this friendlier</article>
+                <article><span>◫</span>Plan my week</article>
+              </div>
+              <div class="today-panel">
+                <div>
+                  <span class="status danger"></span>
+                  <strong>Overdue</strong>
+                  <p>Private item hidden</p>
+                </div>
+                <div>
+                  <span class="status progress"></span>
+                  <strong>In progress</strong>
+                  <p>Client quote, follow-up, admin work</p>
+                </div>
+                <div>
+                  <span class="status todo"></span>
+                  <strong>To do</strong>
+                  <p>Invites, FAQ, support coverage</p>
+                </div>
+              </div>
+              <div class="tool-cards">
+                <article>
+                  <span class="tool-icon">✦</span>
+                  <strong>Quick Actions</strong>
+                  <p>One-click help for everyday tasks.</p>
+                </article>
+                <article>
+                  <span class="tool-icon">▣</span>
+                  <strong>Meeting Notes</strong>
+                  <p>Turn meeting notes into real tasks.</p>
+                </article>
+                <article>
+                  <span class="tool-icon">◫</span>
+                  <strong>Smart Inbox</strong>
+                  <p>Drop or paste anything. It is sorted for review.</p>
+                </article>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-pad quickstart" id="quickstart">
+        <div class="section-heading">
+          <p class="overline">Quick Start</p>
+          <h2>One line downloads, sets up, starts, and opens Haven Desk.</h2>
+          <p>
+            This is the low-friction pilot path. It downloads the public repo, runs the existing setup,
+            starts the local stack, and opens <code>localhost:4141</code>.
+          </p>
+        </div>
+        <div class="terminal-card">
+          <div class="terminal-topbar">
+            <div class="traffic-lights" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="install-tabs" role="tablist" aria-label="Install platform">
+              <button class="install-tab active" type="button" role="tab" aria-selected="true" data-install-tab="mac">
+                macOS
+              </button>
+              <button class="install-tab" type="button" role="tab" aria-selected="false" data-install-tab="windows">
+                Windows
+              </button>
+            </div>
+            <span class="pilot-pill">pilot</span>
+          </div>
+          <div class="install-panel active" data-install-panel="mac">
+            <p># Installs Homebrew/Git if needed, downloads Haven Desk, starts the local app.</p>
+            <div class="command-row">
+              <pre><code id="install-command-mac">curl -fsSL https://<wbr />omerakben.github.io/<wbr />swiss-knife/<wbr />install.sh | bash</code></pre>
+              <button class="copy-command" type="button" data-copy-command="install-command-mac" aria-label="Copy macOS command">
+                Copy
+              </button>
+            </div>
+          </div>
+          <div class="install-panel" data-install-panel="windows">
+            <p># Run in PowerShell. Installs Git if needed, downloads Haven Desk, starts the local app.</p>
+            <div class="command-row">
+              <pre><code id="install-command-windows">irm https://<wbr />omerakben.github.io/<wbr />swiss-knife/<wbr />install.ps1 | iex</code></pre>
+              <button class="copy-command" type="button" data-copy-command="install-command-windows" aria-label="Copy Windows command">
+                Copy
+              </button>
+            </div>
+          </div>
+          <div class="quickstart-notes">
+            <span>Downloads to <code>~/HavenDesk</code> by default.</span>
+            <span>Uses <code>omerakben/swiss-knife</code> until a separate Haven Desk repo exists.</span>
+            <span>Requires Docker Desktop and Ollama because the app runs local-first.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-pad workflow" id="workflow">
+        <div class="section-heading">
+          <p class="overline">The actual daily loop</p>
+          <h2>Start with one messy input. End with something you can review and use.</h2>
+        </div>
+        <div class="workflow-rail">
+          <article>
+            <span>01</span>
+            <h3>Quick Actions</h3>
+            <p>Use real action buttons already in the app: reply, summarize, make friendlier, plan the week, or turn notes into a to-do list.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Meeting Notes</h3>
+            <p>Paste rough notes. Haven Desk extracts action items. You review and edit before adding them as tasks.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Smart Inbox</h3>
+            <p>Paste a note, a list, a message, or a supported file. The app sorts it as a task, fact, or idea for review.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Email Writer</h3>
+            <p>Draft a reply or follow-up in the right tone. Haven Desk does not send it. You decide what leaves your machine.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-pad pack-section" id="pack">
+        <div class="pack-copy">
+          <p class="overline">Installed workflow pack</p>
+          <h2>Small Business Ops is the first commercial wedge.</h2>
+          <p>
+            The live app already shows a Small Business Ops pack. Packs bundle templates,
+            memory facts, and setup tasks for a job. They are declarative and reviewed before install.
+          </p>
+        </div>
+        <div class="pack-console">
+          <div class="pack-header">
+            <div>
+              <strong>Small Business Ops</strong>
+              <span>v0.1.0 · L0 · installed</span>
+            </div>
+            <button type="button">Reinstall</button>
+          </div>
+          <div class="pack-stats">
+            <span><strong>6</strong> templates</span>
+            <span><strong>2</strong> memory facts</span>
+            <span><strong>2</strong> tasks</span>
+          </div>
+          <ul class="pack-list">
+            <li>Turn meeting notes into tasks and a follow-up draft</li>
+            <li>Draft a proposal from a rough brief</li>
+            <li>Draft a follow-up email in your tone</li>
+            <li>Build a standard operating procedure from rough steps</li>
+          </ul>
+          <p class="local-note">Local and reviewed: no network, no sending, no code, no unattended action.</p>
+        </div>
+      </section>
+
+      <section class="section-pad honesty-section">
+        <div class="honesty-card">
+          <p class="overline">Honest positioning</p>
+          <h2>This is not trying to beat Open WebUI at being an AI platform.</h2>
+          <p>
+            Open WebUI is broader and more powerful for technical users. Haven Desk should win a narrower
+            job: small-business operators who want a local desk that starts from daily admin work,
+            gives them reviewed next steps, and keeps the workflow simple.
+          </p>
+        </div>
+        <div class="compare-grid">
+          <article>
+            <span>Haven Desk</span>
+            <strong>Workflow-first local desk</strong>
+            <p>Quick actions, packs, tasks, drafts, and review-before-use patterns for repeat admin jobs.</p>
+          </article>
+          <article>
+            <span>Open WebUI</span>
+            <strong>General AI interface</strong>
+            <p>Excellent for people who already know how to configure models, prompts, tools, and workflows.</p>
+          </article>
+          <article>
+            <span>Why buy?</span>
+            <strong>Less setup, less thinking, more follow-through</strong>
+            <p>The pitch is not more AI. It is a calmer way to finish the admin work small businesses keep dropping.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-pad setup" id="setup">
+        <div class="section-heading left">
+          <p class="overline">What the installer does</p>
+          <h2>The one-liner is thin on purpose.</h2>
+          <p>
+            It avoids inventing a second install system. The hosted script downloads the repo, then runs
+            the same setup and launch commands we already validate locally.
+          </p>
+        </div>
+        <div class="setup-grid">
+          <article>
+            <span>01</span>
+            <p>Clone or update <code>https://github.com/omerakben/swiss-knife.git</code> into <code>~/HavenDesk</code>.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <p>Run <code>./swiss setup</code> on macOS or <code>.\swiss.ps1 setup</code> on Windows.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <p>Start Docker Desktop when needed, then run the existing <code>up</code> command.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <p>Open Haven Desk at <code>http://localhost:4141</code>; Open WebUI remains available on <code>4142</code>.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-pad apply" id="apply">
+        <div class="apply-copy">
+          <p class="overline">Small business early access</p>
+          <h2>Apply with one recurring admin job.</h2>
+          <p>
+            The best pilot is specific: weekly notes, client follow-ups, proposals, SOPs,
+            or inbox triage. The static page prepares a message only. It does not store applications.
+          </p>
+        </div>
+        <form class="apply-form" id="pilot-form">
+          <label>
+            Your name
+            <input name="name" autocomplete="name" required />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            Business type
+            <input name="business" placeholder="Consultant, local service, agency..." required />
+          </label>
+          <label>
+            Weekly admin pain
+            <textarea name="pain" rows="4" placeholder="What recurring admin job costs time every week?" required></textarea>
+          </label>
+          <label>
+            What would you avoid pasting into a cloud chatbot?
+            <textarea name="privacy" rows="3" required></textarea>
+          </label>
+          <label>
+            Machine
+            <select name="machine" required>
+              <option value="">Choose one</option>
+              <option>Mac</option>
+              <option>Windows</option>
+              <option>Both</option>
+              <option>Not sure</option>
+            </select>
+          </label>
+          <label class="consent">
+            <input type="checkbox" name="consent" required />
+            I understand this is early access and Haven Desk will not send messages or take external actions for me.
+          </label>
+          <button class="button primary" type="submit">Prepare my application</button>
+          <p class="form-note">
+            Contact routing is not configured yet. Review the generated summary before sending it through the approved pilot channel.
+          </p>
+        </form>
+        <div class="application-output" id="application-output" hidden>
+          <h3>Your application summary</h3>
+          <textarea id="application-summary" rows="12" readonly></textarea>
+          <div class="output-actions">
+            <button class="button secondary" type="button" id="copy-application">Copy application</button>
+            <a class="button primary" id="email-application" href="#">Email application</a>
+          </div>
+          <p id="email-warning" class="form-note"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>(c) 2026 Haven Desk</span>
+      <a href="#top">Back to top</a>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
