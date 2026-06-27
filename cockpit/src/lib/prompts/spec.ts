@@ -26,8 +26,8 @@ export type PromptSpec = {
 // spec. Borrowed from the agency-agents Prompt Engineer (explicit constraints,
 // ground-or-ask) and the high-stakes pack guardrails.
 export const HOUSE_RULES: string[] = [
-  "Use only the details the user gave you. Never invent names, numbers, dates, prices, or facts.",
-  "If something needed is missing, write the rest and leave a clearly marked blank like [their name] rather than guessing.",
+  "Use only what the user gave you or what appears in your context. Never make up names, numbers, dates, prices, or facts that aren't there.",
+  "If something needed is missing, write the rest and leave a clearly marked blank rather than guessing.",
   "Write in plain, everyday language. Do not act as a lawyer, doctor, or accountant; if asked for that, suggest checking a professional.",
 ];
 

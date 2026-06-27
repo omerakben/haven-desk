@@ -48,5 +48,11 @@ export async function POST(req: Request) {
   const notReady = await assertOllamaReady();
   if (notReady) return notReady;
 
-  return streamTextResponse({ messages: buildMessages(action, vals) });
+  // Honor the spec's per-action temperature (e.g. 0.3 for the structured
+  // summarize/plan-week, 0.4 for the writing flows); falls back to the config
+  // default for un-migrated actions with no spec.
+  return streamTextResponse({
+    messages: buildMessages(action, vals),
+    temperature: action.spec?.temperature,
+  });
 }

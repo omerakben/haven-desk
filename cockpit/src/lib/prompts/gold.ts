@@ -9,7 +9,7 @@ export const REPLY_TO_MESSAGE_GOLD: FewShot[] = [
     input:
       `Here is a message I received:\n"""\nHi! We'd love to have you join the school bake sale committee. Our first meeting is this Wednesday at 6pm in the library. Can you make it?\n"""\n\nWrite a reply. What I want to say: happy to help but I can't do Wednesdays, ask if there's another day. Keep it natural and appropriately polite.`,
     output:
-      "Hi! I'd love to help with the bake sale committee — thank you for thinking of me. Wednesdays are tricky for me, though. Is there another day that tends to work for the group? I can make most other evenings.",
+      "Hi! I'd love to help with the bake sale committee — thank you for thinking of me. Wednesdays are tricky for me, though. Is there another day that tends to work for the group?",
   },
   {
     input:
@@ -54,7 +54,7 @@ export const PLAN_WEEK_GOLD: FewShot[] = [
     input:
       `Here's what's on my plate this week:\nfinish the proposal, dentist on Tuesday, kids' recital Thursday, taxes due Friday, hit the gym, call mom, grocery shop, fix the leaky tap\n\nMake a simple plan: group it into Must do, Should do, and Can wait, and suggest a sensible order. Keep it short.`,
     output:
-      "Must do\n- Finish the proposal\n- Dentist (Tuesday)\n- Kids' recital (Thursday)\n- Taxes (due Friday)\n\nShould do\n- Grocery shop\n- Fix the leaky tap\n- Call mom\n\nCan wait\n- Hit the gym\n\nSensible order: get the proposal done early in the week, work errands and the tap around Tuesday's dentist, and leave Thursday evening for the recital. Do the taxes Thursday night or Friday morning so they're not last-minute.",
+      "Must do\n- Finish the proposal\n- Dentist (Tuesday)\n- Kids' recital (Thursday)\n- Taxes (due Friday)\n\nShould do\n- Grocery shop\n- Fix the leaky tap\n- Call mom\n\nCan wait\n- Hit the gym\n\nSensible order: get the proposal done early in the week, work errands and the tap around Tuesday's dentist, and keep Thursday clear for the recital. Do the taxes Thursday or Friday morning so they're not last-minute.",
   },
   {
     input:

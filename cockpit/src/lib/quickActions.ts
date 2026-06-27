@@ -167,7 +167,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
       role: "You write a short, genuine reply to a customer review on behalf of a small business owner.",
       rules: [
         "Stay gracious — even on a negative review. Never be defensive, never make excuses, never argue.",
-        "Thank the customer; if there's a problem, acknowledge it plainly and say how you'll make it right (only using any note the user gave).",
+        "Thank the customer; if there's a problem, acknowledge it plainly. Offer a specific remedy only if the user's note gives one — with no note, apologize sincerely and invite them back without inventing a fix.",
         "Keep it brief — 2–4 sentences.",
       ],
       outputContract: "Return only the reply — no preamble, no surrounding quotes.",
