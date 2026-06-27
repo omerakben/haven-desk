@@ -5,7 +5,7 @@ test.describe("phase 4", () => {
     await page.goto("/tools/memory");
     await expect(page.getByRole("heading", { name: /memory/i })).toBeVisible();
     await expect(page.getByPlaceholder(/add a fact/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /suggest from text/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /find facts in text/i })).toBeVisible();
   });
 
   test("image page shows upload + ask controls", async ({ page }) => {
