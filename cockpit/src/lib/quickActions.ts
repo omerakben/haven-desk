@@ -23,8 +23,14 @@ export type QuickActionExample = { label: string; inputs: Record<string, string>
 export const INBOX_TARGET = "inbox";
 // The Image tool is a starter target too: its question presets fill the prompt.
 export const IMAGE_TARGET = "image";
-// The single text field shared by the inbox and image starter targets.
+// Email Writer and Meeting Notes are single-text starter targets too (the brief
+// and the pasted notes) — killing the last blank-box openings.
+export const EMAIL_TARGET = "email";
+export const MEETING_TARGET = "meeting-notes";
+// The single text field shared by the single-text starter targets above.
 export const INBOX_FIELD = "text";
+// The single-text (no action schema) starter targets.
+export const TEXT_STARTER_TARGETS = [INBOX_TARGET, IMAGE_TARGET, EMAIL_TARGET, MEETING_TARGET];
 
 // A built-in starter: the seed source for the editable Starter rows (lib/starters.ts).
 // `key` is the stable sourceKey; `target` is a QuickAction id or INBOX_TARGET.
@@ -110,6 +116,51 @@ export const QUICK_ACTIONS: QuickAction[] = [
     ],
     system: "You write warm, sincere, short thank-you notes. Return only the note.",
     buildPrompt: (i) => `Write a warm, genuine thank-you note to ${v(i, "who")} for ${v(i, "for")}. Keep it short and heartfelt.`,
+  },
+  {
+    id: "translate",
+    title: "Translate this",
+    blurb: "Translate text into another language — privately, on your machine.",
+    category: "write",
+    icon: "Languages",
+    inputs: [
+      { name: "text", label: "Text to translate", type: "textarea", placeholder: "Paste the text…" },
+      { name: "language", label: "Into which language?", type: "text", placeholder: "e.g. Spanish, French, Japanese" },
+    ],
+    system:
+      "You are a careful translator. Translate the user's text into the target language, preserving tone and meaning. Return only the translation — no notes, transliteration, or commentary.",
+    buildPrompt: (i) => `Translate the following text into ${v(i, "language")}:\n"""\n${v(i, "text")}\n"""`,
+  },
+  {
+    id: "reply-to-review",
+    title: "Reply to a review",
+    blurb: "A warm, professional reply to a customer review — good or bad.",
+    category: "write",
+    icon: "Star",
+    inputs: [
+      { name: "review", label: "The review", type: "textarea", placeholder: "Paste the customer's review…" },
+      { name: "note", label: "Anything to add? (optional)", type: "text", placeholder: "e.g. offer a refund, thank them by name", optional: true },
+    ],
+    system:
+      "You write short, professional, genuine replies to customer reviews for a small business. Stay gracious even with negative reviews; never be defensive or make excuses. Return only the reply.",
+    buildPrompt: (i) => {
+      const note = v(i, "note");
+      return `Write a reply to this customer review:\n"""\n${v(i, "review")}\n"""\n${note ? `Also keep in mind: ${note}.\n` : ""}Keep it warm, professional, and brief.`;
+    },
+  },
+  {
+    id: "product-description",
+    title: "Write a product description",
+    blurb: "Turn a few details into a clear, appealing product description.",
+    category: "write",
+    icon: "Tag",
+    inputs: [
+      { name: "product", label: "What's the product?", type: "text", placeholder: "e.g. handmade lavender soap" },
+      { name: "details", label: "Key details", type: "textarea", placeholder: "Materials, size, what makes it special…" },
+    ],
+    system:
+      "You write concise, appealing product descriptions for small businesses. Lead with the benefit, keep it honest and easy to scan. Return only the description.",
+    buildPrompt: (i) => `Write a short, appealing product description.\nProduct: ${v(i, "product")}\nKey details: ${v(i, "details")}`,
   },
   // ── Organize & summarize ─────────────────────────────────────────────────────
   {
@@ -313,6 +364,19 @@ export const BUILTIN_STARTERS: BuiltinStarter[] = [
   // thank-you-note
   { target: "thank-you-note", key: "thank-you-note:gift", label: "A birthday gift",
     inputs: { who: "Aunt Mary", for: "the lovely birthday scarf" } },
+  // translate
+  { target: "translate", key: "translate:spanish-letter", label: "A letter in Spanish",
+    inputs: { text: "Estimada vecina, le aviso que cortarán el agua el martes por la mañana por unas reparaciones. Disculpe las molestias.", language: "English" } },
+  { target: "translate", key: "translate:to-french", label: "Reply in French",
+    inputs: { text: "Thanks so much for your order — it will ship on Monday and arrive by Friday.", language: "French" } },
+  // reply-to-review
+  { target: "reply-to-review", key: "reply-to-review:happy", label: "A 5-star review",
+    inputs: { review: "Absolutely loved the cake for my daughter's birthday — beautiful and delicious. Will order again!", note: "" } },
+  { target: "reply-to-review", key: "reply-to-review:unhappy", label: "An unhappy review",
+    inputs: { review: "Waited 40 minutes for a table even with a reservation. The food was good but the wait was frustrating.", note: "apologize and offer a free dessert on their next visit" } },
+  // product-description
+  { target: "product-description", key: "product-description:soap", label: "Handmade soap",
+    inputs: { product: "handmade lavender soap", details: "olive oil base, dried lavender from a local farm, 100g bar, gentle on sensitive skin" } },
   // notes-to-list
   { target: "notes-to-list", key: "notes-to-list:brain-dump", label: "A meeting brain-dump",
     inputs: { notes: "call the printer about the proofs, Sam owes me the quote, book the venue for the 12th, follow up with Dana, order more business cards" } },
@@ -382,13 +446,23 @@ export const BUILTIN_STARTERS: BuiltinStarter[] = [
     inputs: { [INBOX_FIELD]: "This is a receipt or invoice. Pull out the vendor, date, total, and a spending category. If a field is missing, say \"unknown\"." } },
   { target: IMAGE_TARGET, key: "image:screenshot", label: "What's in this screenshot?",
     inputs: { [INBOX_FIELD]: "What is shown in this screenshot, and what is it asking me to do?" } },
+  // Email Writer starters — fill the brief.
+  { target: EMAIL_TARGET, key: "email:overdue-invoice", label: "Chase an overdue invoice",
+    inputs: { [INBOX_FIELD]: "Politely remind a client their invoice (#1042, $1,200) is two weeks overdue, and ask when I can expect payment." } },
+  { target: EMAIL_TARGET, key: "email:decline", label: "Decline politely",
+    inputs: { [INBOX_FIELD]: "Turn down an invitation to speak at an event because I'm fully booked that month, but offer to help another time." } },
+  { target: EMAIL_TARGET, key: "email:intro", label: "Introduce two people",
+    inputs: { [INBOX_FIELD]: "Introduce my colleague Dana (a designer) to my friend Sam (starting a bakery and needs branding), and explain why they should connect." } },
+  // Meeting Notes starters — fill the notes box.
+  { target: MEETING_TARGET, key: "meeting:rough", label: "Rough meeting notes",
+    inputs: { [INBOX_FIELD]: "Standup: Sam to send the client quote by Friday. Dana finishing the logo, needs feedback by Wed. Book the venue for the 12th. Order more business cards. Follow up with the printer about the proofs." } },
 ];
 
 // Group the action-targeted built-ins into the per-action example shape the
 // runner, the attach, and getFeaturedDemo already use (inbox starters excluded).
 const EXAMPLES_BY_ACTION: Record<string, QuickActionExample[]> = {};
 for (const s of BUILTIN_STARTERS) {
-  if (s.target === INBOX_TARGET || s.target === IMAGE_TARGET) continue;
+  if (TEXT_STARTER_TARGETS.includes(s.target)) continue;
   (EXAMPLES_BY_ACTION[s.target] ??= []).push({ label: s.label, inputs: s.inputs });
 }
 for (const a of QUICK_ACTIONS) {
@@ -406,6 +480,32 @@ export function getFeaturedDemo(): { action: QuickAction; example: QuickActionEx
 
 export function getQuickAction(id: string): QuickAction | undefined {
   return QUICK_ACTIONS.find((a) => a.id === id);
+}
+
+// Dashboard hero actions — the six one-click actions surfaced on the home screen.
+// Tailored to the onboarding persona so the pick finally pays off; falls back to a
+// sensible everyday default for "skipped"/no persona. All ids are real actions
+// above (enforced by a unit test).
+export const DEFAULT_HERO_IDS = [
+  "reply-to-message",
+  "notes-to-list",
+  "summarize",
+  "polite-message",
+  "make-friendlier",
+  "plan-week",
+];
+
+export const HERO_IDS_BY_PERSONA: Record<string, string[]> = {
+  household: ["reply-to-message", "notes-to-list", "plan-week", "meal-plan", "polite-message", "summarize"],
+  "small-business": ["polite-message", "reply-to-message", "find-action-items", "plan-week", "make-professional", "summarize"],
+  student: ["explain-simply", "study-plan", "summarize", "key-points", "notes-to-list", "fix-writing"],
+  creative: ["social-post", "make-friendlier", "notes-to-list", "summarize", "reply-to-message", "key-points"],
+  "personal-admin": ["explain-simply", "polite-message", "summarize", "key-points", "find-action-items", "notes-to-list"],
+};
+
+/** The home-screen hero action ids for a persona ("skipped"/null → default). */
+export function getHeroIds(persona: string | null | undefined): string[] {
+  return (persona && HERO_IDS_BY_PERSONA[persona]) || DEFAULT_HERO_IDS;
 }
 
 /**

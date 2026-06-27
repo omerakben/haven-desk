@@ -25,6 +25,9 @@ import {
   Megaphone,
   MessageSquareHeart,
   Luggage,
+  Languages,
+  Star,
+  Tag,
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
@@ -72,6 +75,9 @@ const ICONS: Record<string, LucideIcon> = {
   Megaphone,
   MessageSquareHeart,
   Luggage,
+  Languages,
+  Star,
+  Tag,
 };
 
 function ActionCard({ a, onOpen }: { a: QuickAction; onOpen: (a: QuickAction) => void }) {

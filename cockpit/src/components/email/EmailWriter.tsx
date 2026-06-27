@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { useAiTool } from "@/hooks/useAiTool";
 import { AiOutput } from "@/components/tools/AiOutput";
 import { RefineRow } from "@/components/tools/RefineRow";
+import { StarterChips } from "@/components/StarterChips";
+import { EMAIL_TARGET, INBOX_FIELD } from "@/lib/quickActions";
 import { ContextUsed } from "@/components/tools/ContextUsed";
 import { Button } from "@/components/ui/button";
 import { VoiceTextarea } from "@/components/tools/VoiceTextarea";
@@ -151,6 +153,17 @@ export function EmailWriter() {
           />
         </div>
       )}
+
+      <div className="mt-4">
+        <StarterChips
+          target={EMAIL_TARGET}
+          fallback={[]}
+          current={{ [INBOX_FIELD]: brief }}
+          onPick={(inputs) => setBrief(inputs[INBOX_FIELD] ?? "")}
+          editFields={[{ name: INBOX_FIELD, label: "Brief", type: "textarea" }]}
+          headline="Not sure where to start? Tap one:"
+        />
+      </div>
 
       <div className="mt-4 space-y-1.5">
         <Label htmlFor="brief">Brief — what should it say?</Label>

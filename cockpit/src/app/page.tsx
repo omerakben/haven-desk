@@ -74,7 +74,7 @@ export default async function Dashboard() {
 
       {!(firstRun && !persona) && (
         <div className="mt-6">
-          <DashboardQuickActions />
+          <DashboardQuickActions persona={persona} />
         </div>
       )}
 

@@ -1,18 +1,50 @@
 import Link from "next/link";
-import { Reply, ListChecks, FileText, Mail, Smile, CalendarDays, Sparkles, type LucideIcon } from "lucide-react";
+import {
+  Reply,
+  ListChecks,
+  FileText,
+  Mail,
+  Smile,
+  CalendarDays,
+  Utensils,
+  CheckSquare,
+  Briefcase,
+  Lightbulb,
+  GraduationCap,
+  ListFilter,
+  SpellCheck,
+  Megaphone,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 
-import { QUICK_ACTIONS, type QuickAction } from "@/lib/quickActions";
+import { QUICK_ACTIONS, getHeroIds, type QuickAction } from "@/lib/quickActions";
 
 // The marketable hook on the home screen: a few one-click actions a non-technical
-// user can use immediately. Each deep-links to the action's form on the Quick
-// Actions page. Server component (just links), so it adds no client JS.
-const HERO_IDS = ["reply-to-message", "notes-to-list", "summarize", "polite-message", "make-friendlier", "plan-week"];
-const ICONS: Record<string, LucideIcon> = { Reply, ListChecks, FileText, Mail, Smile, CalendarDays };
+// user can use immediately, TAILORED to the onboarding persona (the pick was
+// collected and then ignored before). Each deep-links to the action's form. A
+// server component (just links), so it adds no client JS.
+const ICONS: Record<string, LucideIcon> = {
+  Reply,
+  ListChecks,
+  FileText,
+  Mail,
+  Smile,
+  CalendarDays,
+  Utensils,
+  CheckSquare,
+  Briefcase,
+  Lightbulb,
+  GraduationCap,
+  ListFilter,
+  SpellCheck,
+  Megaphone,
+};
 
-export function DashboardQuickActions() {
-  const actions = HERO_IDS.map((id) => QUICK_ACTIONS.find((a) => a.id === id)).filter(
-    (a): a is QuickAction => Boolean(a),
-  );
+export function DashboardQuickActions({ persona }: { persona?: string | null }) {
+  const actions = getHeroIds(persona)
+    .map((id) => QUICK_ACTIONS.find((a) => a.id === id))
+    .filter((a): a is QuickAction => Boolean(a));
 
   return (
     <div>

@@ -2,7 +2,7 @@
 // shipped standards and the write-time validation gate. No I/O — the routes do
 // the prisma upserts. See docs/superpowers/specs/2026-06-26-user-crud-starters-design.md.
 
-import { BuiltinStarter, getQuickAction, missingInputs, INBOX_TARGET, IMAGE_TARGET, INBOX_FIELD } from "./quickActions";
+import { BuiltinStarter, getQuickAction, missingInputs, INBOX_FIELD, TEXT_STARTER_TARGETS } from "./quickActions";
 
 export const MAX_LABEL = 100;
 export const MAX_INPUTS_BYTES = 8192;
@@ -63,8 +63,8 @@ export function validateStarter(target: string, label: string, inputs: Record<st
   }
   if (JSON.stringify(inputs).length > MAX_INPUTS_BYTES) return { ok: false, error: "That starter is too long." };
 
-  // The inbox and image targets are single-text-field starters (no action schema).
-  if (target === INBOX_TARGET || target === IMAGE_TARGET) {
+  // The single-text targets (inbox/image/email/meeting) have no action schema.
+  if (TEXT_STARTER_TARGETS.includes(target)) {
     const text = inputs[INBOX_FIELD];
     if (typeof text !== "string" || !text.trim()) return { ok: false, error: "This starter needs some text." };
     return { ok: true };

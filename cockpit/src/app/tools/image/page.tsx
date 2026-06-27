@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { useAiTool } from "@/hooks/useAiTool";
 import { useIsMac } from "@/hooks/useIsMac";
 import { AiOutput } from "@/components/tools/AiOutput";
+import { RefineRow } from "@/components/tools/RefineRow";
+import { ExtractTasksButton } from "@/components/tools/ExtractTasksButton";
 import { StarterChips } from "@/components/StarterChips";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,7 +24,7 @@ export default function ImagePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const { output, status, error, isRunning, elapsedMs, run, stop } = useAiTool({
+  const { output, status, error, isRunning, elapsedMs, run, refine, stop } = useAiTool({
     endpoint: "/api/vision",
     buildBody: () => ({ prompt, image }),
   });
@@ -78,7 +80,7 @@ export default function ImagePage() {
   }
 
   // Keep the answer: image + response become an Idea (like quick-capture).
-  async function saveAsIdea() {
+  async function saveAsNote() {
     if (!output || !lastRun.current) return;
     setSaving(true);
     try {
@@ -98,7 +100,9 @@ export default function ImagePage() {
         throw new Error(data.error || "Couldn't save.");
       }
       setSaved(true);
-      toast.success("Saved as an idea");
+      toast.success("Saved as a note", {
+        action: { label: "Open", onClick: () => { window.location.href = "/tools/notes"; } },
+      });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save.");
     } finally {
@@ -182,10 +186,20 @@ export default function ImagePage() {
       <AiOutput output={output} status={status} label="Answer" />
 
       {output && status === "done" && (
-        <div className="mt-3">
-          <Button variant="outline" onClick={saveAsIdea} disabled={saving || saved}>
-            {saved ? "Saved ✓" : saving ? "Saving…" : "Save as idea"}
+        <RefineRow
+          onRefine={(instruction) => {
+            setSaved(false);
+            refine(instruction);
+          }}
+          busy={isRunning}
+        />
+      )}
+      {output && status === "done" && (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" className="h-7 px-2 text-xs" onClick={saveAsNote} disabled={saving || saved}>
+            {saved ? "Saved ✓" : saving ? "Saving…" : "Save as note"}
           </Button>
+          <ExtractTasksButton text={output} label="Turn into tasks" />
         </div>
       )}
     </div>
