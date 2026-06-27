@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { PROMPT_TEMPLATE_WHERE } from "@/lib/templateGroups";
 import { PromptLibrary } from "@/components/library/PromptLibrary";
 
 export const runtime = "nodejs";
@@ -18,7 +19,7 @@ export default async function PromptLibraryPage({
       })
       .catch(() => []),
     prisma.template
-      .findMany({ where: { kind: "prompt", archived: false }, orderBy: { name: "asc" } })
+      .findMany({ where: PROMPT_TEMPLATE_WHERE, orderBy: { name: "asc" } })
       .catch(() => []),
   ]);
 

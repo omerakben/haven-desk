@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/db";
+import { PROMPT_TEMPLATE_WHERE } from "@/lib/templateGroups";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export type SearchResult = {
-  type: "Prompt" | "Idea" | "Task" | "Fact" | "Email" | "QA";
+  type: "Prompt" | "Idea" | "Task" | "Fact" | "Email" | "QA" | "Template";
   id: string;
   title: string;
   subtitle?: string;
@@ -18,7 +19,7 @@ export async function GET(req: Request) {
   if (q.length < 2) return Response.json({ results: [] });
   const take = 6;
 
-  const [prompts, ideas, tasks, facts, emails, sessions] = await Promise.all([
+  const [prompts, ideas, tasks, facts, emails, sessions, templates] = await Promise.all([
     prisma.prompt
       .findMany({
         where: { OR: [{ title: { contains: q } }, { original: { contains: q } }, { optimized: { contains: q } }] },
@@ -67,6 +68,14 @@ export async function GET(req: Request) {
         select: { id: true, title: true },
       })
       .catch(() => []),
+    prisma.template
+      .findMany({
+        where: { ...PROMPT_TEMPLATE_WHERE, OR: [{ name: { contains: q } }, { description: { contains: q } }, { body: { contains: q } }] },
+        take,
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, name: true, description: true },
+      })
+      .catch(() => []),
   ]);
 
   // Deep links: every href targets the ITEM (seeded search / direct open),
@@ -110,6 +119,13 @@ export async function GET(req: Request) {
       id: s.id,
       title: s.title,
       href: `/tools/qa-pipeline?session=${s.id}`,
+    })),
+    ...templates.map((t) => ({
+      type: "Template" as const,
+      id: t.id,
+      title: t.name,
+      subtitle: t.description ?? undefined,
+      href: `/tools/templates?run=${t.id}`,
     })),
   ];
 

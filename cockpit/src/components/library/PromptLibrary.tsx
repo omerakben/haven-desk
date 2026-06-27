@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TemplateRunner } from "@/components/library/TemplateRunner";
+import { TemplateRunDialog } from "@/components/library/TemplateRunDialog";
 import { templateVariableNames } from "@/lib/templates";
 
 export type LibPrompt = {
@@ -420,19 +420,12 @@ export function PromptLibrary({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!useTemplate} onOpenChange={(o) => !o && setUseTemplate(null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto overflow-x-hidden sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{useTemplate?.name}</DialogTitle>
-            {useTemplate?.description && (
-              <DialogDescription>{useTemplate.description}</DialogDescription>
-            )}
-          </DialogHeader>
-          {useTemplate && (
-            <TemplateRunner template={useTemplate} savedLabel="Saved to library" />
-          )}
-        </DialogContent>
-      </Dialog>
+      <TemplateRunDialog
+        template={useTemplate}
+        open={!!useTemplate}
+        onOpenChange={(o) => !o && setUseTemplate(null)}
+        savedLabel="Saved to library"
+      />
 
       <Dialog open={!!tmplSeed} onOpenChange={(o) => !o && setTmplSeed(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">

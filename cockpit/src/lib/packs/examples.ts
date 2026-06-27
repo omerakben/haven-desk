@@ -32,6 +32,7 @@ export const smallBusinessOpsPack: PluginManifest = {
     {
       slug: "sbo-meeting-notes-to-tasks",
       kind: "prompt",
+      category: "planning",
       name: "Meeting notes to tasks",
       description: "Extract action items, owners, and dates from rough meeting notes.",
       body: "Read these meeting notes and list the action items as tasks. For each: a short title, the owner if named, and a due date if stated. Keep it to what the notes actually say.\n\nNotes:\n{{notes}}",
@@ -40,6 +41,7 @@ export const smallBusinessOpsPack: PluginManifest = {
     {
       slug: "sbo-follow-up-email",
       kind: "prompt",
+      category: "email",
       name: "Follow-up email",
       description: "Draft a short, polite follow-up after a meeting or quote.",
       body: "Write a short, friendly follow-up email to {{recipient}} about {{topic}}. Keep it under 120 words, end with one clear next step, and do not invent details.",
@@ -51,6 +53,7 @@ export const smallBusinessOpsPack: PluginManifest = {
     {
       slug: "sbo-weekly-review",
       kind: "prompt",
+      category: "planning",
       name: "Weekly business review",
       description: "Summarize the week into wins, open loops, and next week's focus.",
       body: "From these notes and tasks, write a weekly review with three short sections: Wins, Open loops, Focus next week. Be concrete and brief.\n\n{{input}}",
@@ -59,6 +62,7 @@ export const smallBusinessOpsPack: PluginManifest = {
     {
       slug: "sbo-proposal-writer",
       kind: "prompt",
+      category: "proposal",
       name: "Proposal writer",
       description: "Draft a client proposal from a short brief.",
       body: "Write a short, professional proposal for {{client}}. Scope of work: {{scope}}. Use sections: Overview, What's included, Timeline, and Price. Keep it concise and concrete, and do not invent details that aren't in the brief. Budget or rate guidance: {{budget}}.",
@@ -71,6 +75,7 @@ export const smallBusinessOpsPack: PluginManifest = {
     {
       slug: "sbo-sop-builder",
       kind: "prompt",
+      category: "operations",
       name: "SOP builder",
       description: "Turn rough steps into a clean standard operating procedure.",
       body: "Turn these rough steps into a clear standard operating procedure for \"{{task}}\". Number the steps, make each one a single action, add a short Purpose line at the top and a Checklist at the end, and keep only what the notes contain.\n\nSteps:\n{{steps}}",
@@ -82,6 +87,7 @@ export const smallBusinessOpsPack: PluginManifest = {
     {
       slug: "sbo-receipt-organizer",
       kind: "prompt",
+      category: "finance",
       name: "Receipt and invoice organizer",
       description: "Pull the key fields out of a receipt or invoice into one tidy record.",
       body: "Read this receipt or invoice text and return one tidy record with: vendor, date, total amount, and a spending category (for example supplies, travel, software, meals). If a field is missing, write \"unknown\", and do not guess amounts.\n\n{{text}}",
