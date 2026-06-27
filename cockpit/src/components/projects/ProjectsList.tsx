@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
@@ -9,6 +9,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Relatable starter names across personas (small business / individual / home /
+// professional) so a first-timer sees what a "project" is for, not a blank box.
+const EXAMPLE_PROJECTS = ["Acme Bakery", "Side hustle", "Home renovation", "Q3 marketing"];
 
 export type ProjectCounts = {
   prompts: number;
@@ -27,6 +31,12 @@ export type ProjectRow = {
 export function ProjectsList({ projects }: { projects: ProjectRow[] }) {
   const router = useRouter();
   const [name, setName] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function fillExample(example: string) {
+    setName(example);
+    inputRef.current?.focus();
+  }
 
   async function create() {
     if (!name.trim()) return;
@@ -53,6 +63,7 @@ export function ProjectsList({ projects }: { projects: ProjectRow[] }) {
 
       <div className="mt-6 flex gap-2">
         <Input
+          ref={inputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="New project name…"
@@ -67,7 +78,26 @@ export function ProjectsList({ projects }: { projects: ProjectRow[] }) {
       </div>
 
       {projects.length === 0 ? (
-        <p className="mt-6 text-sm text-muted-foreground">No projects yet. Create one above.</p>
+        <div className="mt-6 rounded-lg border border-dashed border-border p-5">
+          <p className="text-sm text-muted-foreground">
+            No projects yet — and that&apos;s fine. Without one, everything lives in your global
+            space. Create a project when you want to keep a client, a side hustle, or a big effort
+            on its own — with its own tasks, notes, drafts, and memory.
+          </p>
+          <p className="mt-3 text-xs font-medium text-muted-foreground">Start with an example:</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {EXAMPLE_PROJECTS.map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                onClick={() => fillExample(ex)}
+                className="rounded-full border border-border px-3 py-1 text-sm transition-colors hover:border-primary/40 hover:bg-accent/60"
+              >
+                {ex}
+              </button>
+            ))}
+          </div>
+        </div>
       ) : (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {projects.map((p) => (
