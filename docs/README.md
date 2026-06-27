@@ -11,11 +11,13 @@ Tagline: Private AI for the work of daily life.
 If you are new to the transition, read top to bottom. If you are implementing, jump to the backlog.
 
 1. [Product narrative](haven-desk-product-narrative.md). What Haven Desk is and is not, the five personas, the local-first trust promise, and competitive positioning. Start here for the story.
-2. [Engineering roadmap](haven-desk-engineering-roadmap.md). Staged milestones M0 to M11 with goals, dependencies, acceptance checks, and guardrails.
-3. [Persona-first UX and information architecture](haven-desk-ux-information-architecture.md). Current navigation versus the target (Today, Capture, Write, Documents, Projects, Packs, Settings), the route mapping, and the first-run onboarding flow.
-4. [Plugin and pack spec](haven-desk-plugin-pack-spec.md). The `PluginManifest` contract, the L0 to L3 maturity ladder, the permission model, the validation rules, and the first pack definitions. Pairs with the shipped code.
-5. [Monetization plan](haven-desk-monetization-plan.md). Free, Pro, solo business, team license, paid packs, and setup/support offers, with pricing labeled as assumptions to validate.
-6. [Implementation backlog](haven-desk-implementation-backlog.md). Issue-ready tasks grouped by milestone, each with scope, files, acceptance, a verify command, and a size.
+2. [2027 business plan](haven-desk-2027-business-plan.md). Commercial strategy, 2027 market thesis, target segments, product roadmap, monetization model, and go-to-market plan.
+3. [Small business early-access campaign](haven-desk-small-business-early-access-campaign.md). Draft pitch, offer, landing-page copy, outreach messages, demo script, objections, and pilot validation metrics for the first buyer wedge.
+4. [Engineering roadmap](haven-desk-engineering-roadmap.md). Staged milestones M0 to M11 with goals, dependencies, acceptance checks, and guardrails.
+5. [Persona-first UX and information architecture](haven-desk-ux-information-architecture.md). Current navigation versus the target (Today, Capture, Write, Documents, Projects, Packs, Settings), the route mapping, and the first-run onboarding flow.
+6. [Plugin and pack spec](haven-desk-plugin-pack-spec.md). The `PluginManifest` contract, the L0 to L3 maturity ladder, the permission model, the validation rules, and the first pack definitions. Pairs with the shipped code.
+7. [Monetization plan](haven-desk-monetization-plan.md). Free, Pro, solo business, team license, paid packs, and setup/support offers, with pricing labeled as assumptions to validate.
+8. [Implementation backlog](haven-desk-implementation-backlog.md). Issue-ready tasks grouped by milestone, each with scope, files, acceptance, a verify command, and a size.
 
 ## Strategy source docs
 
