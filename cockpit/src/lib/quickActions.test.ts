@@ -120,6 +120,34 @@ describe("quickActions", () => {
     ]);
   });
 
+  it("batch-1 actions carry a 2-example spec with a non-empty output contract", () => {
+    for (const id of ["reply-to-message", "reply-to-review", "summarize", "plan-week"]) {
+      const a = getQuickAction(id)!;
+      expect(a.spec, `${id} has a spec`).toBeTruthy();
+      expect(a.spec!.examples.length, `${id} has 2 examples`).toBe(2);
+      expect(a.spec!.outputContract.trim().length, `${id} has a contract`).toBeGreaterThan(0);
+      expect(a.spec!.role.trim().length, `${id} has a role`).toBeGreaterThan(0);
+    }
+  });
+
+  it("each batch-1 spec example input matches that action's buildPrompt shape (few-shot mirrors real input)", () => {
+    // The few-shot the model sees must look exactly like the real templated input,
+    // so format transfer is perfect. We don't know the exact starter values here,
+    // but every example input must contain the action's invariant prompt scaffolding.
+    const scaffold: Record<string, string> = {
+      "reply-to-message": "Write a reply. What I want to say:",
+      "reply-to-review": "Write a reply to this customer review:",
+      summarize: "Summarize this in 3 to 5 sentences",
+      "plan-week": "group it into Must do, Should do, and Can wait",
+    };
+    for (const [id, needle] of Object.entries(scaffold)) {
+      const a = getQuickAction(id)!;
+      for (const ex of a.spec!.examples) {
+        expect(ex.input, `${id} example mirrors buildPrompt`).toContain(needle);
+      }
+    }
+  });
+
   it("every action's buildPrompt produces non-empty text for filled inputs", () => {
     for (const a of QUICK_ACTIONS) {
       const filled = Object.fromEntries(a.inputs.map((i) => [i.name, "sample value"]));

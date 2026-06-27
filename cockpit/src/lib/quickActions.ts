@@ -6,6 +6,12 @@
 
 import type { ChatMessage } from "@/lib/ollama";
 import { compileSpec, type PromptSpec } from "./prompts/spec";
+import {
+  REPLY_TO_MESSAGE_GOLD,
+  REPLY_TO_REVIEW_GOLD,
+  SUMMARIZE_GOLD,
+  PLAN_WEEK_GOLD,
+} from "./prompts/gold";
 
 export type QuickActionCategory = "write" | "organize" | "plan" | "improve";
 
@@ -91,6 +97,17 @@ export const QUICK_ACTIONS: QuickAction[] = [
       { name: "intent", label: "What do you want to say back?", type: "text", placeholder: "e.g. say yes, but ask to move it to Friday" },
     ],
     system: "You help people write clear, kind replies to messages. Return only the reply text, no preamble or commentary.",
+    spec: {
+      role: "You help people write a clear, warm reply to a message they received. You write the reply in their voice — never as an assistant.",
+      rules: [
+        "Match what the user says they want to convey; do not add new commitments or details they didn't mention.",
+        "Sound like a real person — natural, warm, and appropriately polite for who it's going to.",
+        "Keep it about as long as the situation needs; usually 2–5 sentences.",
+      ],
+      outputContract: "Return only the reply text — no preamble, no greeting label, no surrounding quotes.",
+      examples: REPLY_TO_MESSAGE_GOLD,
+      temperature: 0.4,
+    },
     buildPrompt: (i) =>
       `Here is a message I received:\n"""\n${v(i, "message")}\n"""\n\nWrite a reply. What I want to say: ${v(i, "intent")}. Keep it natural and appropriately polite.`,
   },
@@ -146,6 +163,17 @@ export const QUICK_ACTIONS: QuickAction[] = [
     ],
     system:
       "You write short, professional, genuine replies to customer reviews for a small business. Stay gracious even with negative reviews; never be defensive or make excuses. Return only the reply.",
+    spec: {
+      role: "You write a short, genuine reply to a customer review on behalf of a small business owner.",
+      rules: [
+        "Stay gracious — even on a negative review. Never be defensive, never make excuses, never argue.",
+        "Thank the customer; if there's a problem, acknowledge it plainly and say how you'll make it right (only using any note the user gave).",
+        "Keep it brief — 2–4 sentences.",
+      ],
+      outputContract: "Return only the reply — no preamble, no surrounding quotes.",
+      examples: REPLY_TO_REVIEW_GOLD,
+      temperature: 0.4,
+    },
     buildPrompt: (i) => {
       const note = v(i, "note");
       return `Write a reply to this customer review:\n"""\n${v(i, "review")}\n"""\n${note ? `Also keep in mind: ${note}.\n` : ""}Keep it warm, professional, and brief.`;
@@ -186,6 +214,17 @@ export const QUICK_ACTIONS: QuickAction[] = [
     icon: "FileText",
     inputs: [{ name: "text", label: "Paste the text", type: "textarea", placeholder: "An email, an article, a document…" }],
     system: "You summarize text clearly for a busy reader.",
+    spec: {
+      role: "You summarize text clearly for a busy reader who wants the gist fast.",
+      rules: [
+        "First write 3–5 plain sentences capturing the substance — not a description of the text ('this email is about…'), the actual content.",
+        "Then a blank line, then the key points as short bullets starting with '- '.",
+        "Keep every bullet to one line; no filler, no repetition of the prose summary.",
+      ],
+      outputContract: "Return the sentence summary, a blank line, then the bullets. Nothing else.",
+      examples: SUMMARIZE_GOLD,
+      temperature: 0.3,
+    },
     buildPrompt: (i) => `Summarize this in 3 to 5 sentences, then list the key points as bullets:\n\n${v(i, "text")}`,
   },
   {
@@ -208,6 +247,17 @@ export const QUICK_ACTIONS: QuickAction[] = [
     icon: "CalendarDays",
     inputs: [{ name: "plate", label: "What's on your plate this week?", type: "textarea", placeholder: "List everything, in any order…" }],
     system: "You help people turn a list of things into a simple, realistic weekly plan.",
+    spec: {
+      role: "You turn a list of everything on someone's plate into a simple, realistic weekly plan.",
+      rules: [
+        "Group items under exactly three headings: 'Must do', 'Should do', 'Can wait'. Anything with a hard date or deadline goes in 'Must do'.",
+        "Under each heading, list the items as short bullets starting with '- '. Don't invent tasks that weren't given.",
+        "End with one short 'Sensible order' paragraph suggesting a realistic sequence around the fixed dates.",
+      ],
+      outputContract: "Return the three headed groups, then the 'Sensible order' paragraph. Keep it short.",
+      examples: PLAN_WEEK_GOLD,
+      temperature: 0.3,
+    },
     buildPrompt: (i) =>
       `Here's what's on my plate this week:\n${v(i, "plate")}\n\nMake a simple plan: group it into Must do, Should do, and Can wait, and suggest a sensible order. Keep it short.`,
   },
