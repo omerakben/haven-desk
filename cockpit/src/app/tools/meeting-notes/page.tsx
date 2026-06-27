@@ -3,17 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type { DraftTask } from "@/lib/meetingNotes";
-
-type Row = DraftTask & { keep: boolean };
+import { DraftTaskReview, type ReviewRow } from "@/components/tasks/DraftTaskReview";
 
 export default function MeetingNotesPage() {
   const [notes, setNotes] = useState("");
-  const [rows, setRows] = useState<Row[] | null>(null);
+  const [rows, setRows] = useState<ReviewRow[] | null>(null);
   const [dropped, setDropped] = useState(0);
   const [busy, setBusy] = useState(false);
   const [added, setAdded] = useState(0);
@@ -69,7 +66,7 @@ export default function MeetingNotesPage() {
     }
   }
 
-  function update(i: number, patch: Partial<Row>) {
+  function update(i: number, patch: Partial<ReviewRow>) {
     setRows((rs) => (rs ? rs.map((r, idx) => (idx === i ? { ...r, ...patch } : r)) : rs));
   }
 
@@ -118,53 +115,7 @@ export default function MeetingNotesPage() {
               No action items found. Try notes with clearer to-dos.
             </p>
           ) : (
-            <ul className="mt-3 space-y-2">
-              {rows.map((r, i) => (
-                <li key={i} className="flex items-center gap-2.5 rounded-lg border border-border p-2.5">
-                  <input
-                    type="checkbox"
-                    checked={r.keep}
-                    onChange={(e) => update(i, { keep: e.target.checked })}
-                    aria-label={`Keep ${r.title}`}
-                    className="h-4 w-4 shrink-0 accent-primary"
-                  />
-                  <input
-                    value={r.title}
-                    onChange={(e) => update(i, { title: e.target.value })}
-                    aria-label="Task title"
-                    className="min-w-0 flex-1 bg-transparent text-sm focus-visible:outline-none"
-                  />
-                  {r.owner && (
-                    <button
-                      type="button"
-                      onClick={() => update(i, { owner: null })}
-                      aria-label={`Clear owner ${r.owner}`}
-                      title="Clear owner"
-                      className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
-                    >
-                      <Badge variant="outline" className="gap-1 text-[10px]">
-                        {r.owner}
-                        <X className="h-2.5 w-2.5" />
-                      </Badge>
-                    </button>
-                  )}
-                  {r.dueLabel && (
-                    <button
-                      type="button"
-                      onClick={() => update(i, { dueDate: null, dueLabel: null })}
-                      aria-label={`Clear due date ${r.dueLabel}`}
-                      title="Clear due date"
-                      className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
-                    >
-                      <Badge variant="secondary" className="gap-1 text-[10px]">
-                        due {r.dueLabel}
-                        <X className="h-2.5 w-2.5" />
-                      </Badge>
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <DraftTaskReview rows={rows} onUpdate={update} />
           )}
         </div>
       )}
