@@ -66,6 +66,8 @@ export function PromptLibrary({
   templates,
   initialQuery = "",
   initialNewTemplate = false,
+  initialEditId = null,
+  initialDuplicateId = null,
 }: {
   prompts: LibPrompt[];
   templates: LibTemplate[];
@@ -73,6 +75,10 @@ export function PromptLibrary({
   initialQuery?: string;
   /** Open the New-template dialog on the Templates tab (deep link from /tools/templates?new=template). */
   initialNewTemplate?: boolean;
+  /** Open a custom template's Edit dialog (deep link from /tools/templates?edit=<id>). */
+  initialEditId?: string | null;
+  /** Open the duplicate-as-new dialog seeded from a built-in (deep link ?duplicate=<id>). */
+  initialDuplicateId?: string | null;
 }) {
   const router = useRouter();
   const [q, setQ] = useState(initialQuery);
@@ -88,12 +94,25 @@ export function PromptLibrary({
   const [useTemplate, setUseTemplate] = useState<LibTemplate | null>(null);
   const [tmplSeed, setTmplSeed] = useState<TemplateSeed | null>(null);
 
-  // Deep link from /tools/templates ("+ New template"): open the New-template dialog.
+  // Deep links from /tools/templates: open the template dialog on the Templates
+  // tab — a blank New (?new=template), a custom template's Edit (?edit=<id>), or a
+  // built-in forked into a custom copy (?duplicate=<id>).
   useEffect(() => {
-    if (!initialNewTemplate) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven deep-link consume
-    setTmplSeed({ name: "", description: "", category: "", body: "", variables: "" });
-  }, [initialNewTemplate]);
+    if (initialNewTemplate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven deep-link consume
+      setTmplSeed({ name: "", description: "", category: "", body: "", variables: "" });
+      return;
+    }
+    const id = initialEditId || initialDuplicateId;
+    if (!id) return;
+    const t = templates.find((x) => x.id === id);
+    if (!t) return;
+    setTmplSeed(
+      initialEditId
+        ? { id: t.id, name: t.name, description: t.description ?? "", category: t.category ?? "", body: t.body, variables: t.variables }
+        : { name: `Copy of ${t.name}`, description: t.description ?? "", category: t.category ?? "", body: t.body, variables: "" },
+    );
+  }, [initialNewTemplate, initialEditId, initialDuplicateId, templates]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -195,7 +214,10 @@ export function PromptLibrary({
         Saved prompts and reusable variable templates.
       </p>
 
-      <Tabs defaultValue={initialNewTemplate ? "templates" : "prompts"} className="mt-6">
+      <Tabs
+        defaultValue={initialNewTemplate || initialEditId || initialDuplicateId ? "templates" : "prompts"}
+        className="mt-6"
+      >
         <TabsList>
           <TabsTrigger value="prompts">Saved prompts ({prompts.length})</TabsTrigger>
           <TabsTrigger value="templates">Templates ({templates.length})</TabsTrigger>

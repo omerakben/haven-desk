@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Play, Package, Plus } from "lucide-react";
+import { Search, Play, Package, Plus, Pencil, Copy } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -120,9 +120,23 @@ export function TemplatesBrowser({ templates, initialRunId }: { templates: Brows
                           <p className="mt-1 line-clamp-2 text-xs leading-snug text-muted-foreground">{t.description}</p>
                         )}
                       </div>
-                      <div className="mt-auto pt-1">
+                      <div className="mt-auto flex items-center gap-1.5 pt-1">
                         <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => setRunning(t)}>
                           <Play className="mr-1 h-3.5 w-3.5" /> Use
+                        </Button>
+                        {/* Custom templates edit in place; shipped built-ins are
+                            read-only, so they fork into a custom copy ("Customize").
+                            Both deep-link to the Prompt Library with the right dialog. */}
+                        <Button asChild size="sm" variant="ghost" className="h-7 px-2 text-xs text-muted-foreground">
+                          {t.builtin ? (
+                            <Link href={`/tools/prompt-library?duplicate=${t.id}`}>
+                              <Copy className="mr-1 h-3.5 w-3.5" /> Customize
+                            </Link>
+                          ) : (
+                            <Link href={`/tools/prompt-library?edit=${t.id}`}>
+                              <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
+                            </Link>
+                          )}
                         </Button>
                       </div>
                     </CardContent>
