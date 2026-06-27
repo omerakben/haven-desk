@@ -1,0 +1,52 @@
+import {
+  Reply,
+  Mail,
+  Heart,
+  ListChecks,
+  FileText,
+  ListFilter,
+  CalendarDays,
+  Utensils,
+  GraduationCap,
+  Smile,
+  Briefcase,
+  SpellCheck,
+  Scissors,
+  Lightbulb,
+  CheckSquare,
+  Megaphone,
+  MessageSquareHeart,
+  Luggage,
+  Languages,
+  Star,
+  Tag,
+  type LucideIcon,
+} from "lucide-react";
+
+// The ONE icon map for Quick Actions, shared by the runner/gallery and the
+// dashboard hero grid (they used to keep separate maps and one drifted: a new
+// action's icon could render correctly in the gallery but fall back to Sparkles
+// on the dashboard). A unit test asserts every QUICK_ACTIONS.icon is a key here.
+export const QUICK_ACTION_ICONS: Record<string, LucideIcon> = {
+  Reply,
+  Mail,
+  Heart,
+  ListChecks,
+  FileText,
+  ListFilter,
+  CalendarDays,
+  Utensils,
+  GraduationCap,
+  Smile,
+  Briefcase,
+  SpellCheck,
+  Scissors,
+  Lightbulb,
+  CheckSquare,
+  Megaphone,
+  MessageSquareHeart,
+  Luggage,
+  Languages,
+  Star,
+  Tag,
+};

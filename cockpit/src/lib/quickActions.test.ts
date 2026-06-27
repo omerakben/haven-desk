@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { QUICK_ACTION_ICONS } from "./quickActionIcons";
 import {
   QUICK_ACTIONS,
   getQuickAction,
@@ -33,6 +34,12 @@ describe("quickActions", () => {
     expect(getHeroIds("skipped")).toEqual(DEFAULT_HERO_IDS);
     expect(getHeroIds("household")).toEqual(HERO_IDS_BY_PERSONA.household);
     expect(getHeroIds("small-business")).not.toEqual(DEFAULT_HERO_IDS);
+  });
+
+  it("every action's icon is in the shared QUICK_ACTION_ICONS map (gallery + dashboard render the real icon)", () => {
+    for (const a of QUICK_ACTIONS) {
+      expect(QUICK_ACTION_ICONS[a.icon], `action '${a.id}' icon '${a.icon}' is not mapped`).toBeTruthy();
+    }
   });
 
   it("no single-text starter target collides with a real action id (validateStarter would shadow it)", () => {

@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export type SearchResult = {
-  type: "Prompt" | "Idea" | "Task" | "Fact" | "Email" | "QA" | "Template";
+  type: "Prompt" | "Note" | "Task" | "Fact" | "Email" | "QA" | "Template";
   id: string;
   title: string;
   subtitle?: string;
@@ -89,10 +89,12 @@ export async function GET(req: Request) {
       href: `/tools/prompt-library?q=${encodeURIComponent((p.title || "").slice(0, 60))}`,
     })),
     ...ideas.map((i) => ({
-      type: "Idea" as const,
+      type: "Note" as const,
       id: i.id,
-      title: i.title || i.topic || "Idea",
-      href: `/tools/brainstorm?ideaId=${i.id}`,
+      title: i.title || i.topic || "Note",
+      // The Notes home renders the note's actions (turn into tasks / draft email);
+      // Brainstorming does not. Send saved-note searches to their real home.
+      href: `/tools/notes?ideaId=${i.id}`,
     })),
     ...tasks.map((t) => ({
       type: "Task" as const,

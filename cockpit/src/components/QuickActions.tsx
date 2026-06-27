@@ -2,35 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Square,
-  Search,
-  Clock,
-  Reply,
-  Mail,
-  Heart,
-  ListChecks,
-  FileText,
-  ListFilter,
-  CalendarDays,
-  Utensils,
-  GraduationCap,
-  Smile,
-  Briefcase,
-  SpellCheck,
-  Scissors,
-  Lightbulb,
-  CheckSquare,
-  Megaphone,
-  MessageSquareHeart,
-  Luggage,
-  Languages,
-  Star,
-  Tag,
-  Sparkles,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowLeft, Square, Search, Clock, Sparkles } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -53,35 +25,12 @@ import {
   recentActions,
   type QuickAction,
 } from "@/lib/quickActions";
+import { QUICK_ACTION_ICONS } from "@/lib/quickActionIcons";
 
 const RECENTS_KEY = "sk:qa:recents";
 
-const ICONS: Record<string, LucideIcon> = {
-  Reply,
-  Mail,
-  Heart,
-  ListChecks,
-  FileText,
-  ListFilter,
-  CalendarDays,
-  Utensils,
-  GraduationCap,
-  Smile,
-  Briefcase,
-  SpellCheck,
-  Scissors,
-  Lightbulb,
-  CheckSquare,
-  Megaphone,
-  MessageSquareHeart,
-  Luggage,
-  Languages,
-  Star,
-  Tag,
-};
-
 function ActionCard({ a, onOpen }: { a: QuickAction; onOpen: (a: QuickAction) => void }) {
-  const Icon = ICONS[a.icon] ?? Sparkles;
+  const Icon = QUICK_ACTION_ICONS[a.icon] ?? Sparkles;
   return (
     <button
       type="button"
@@ -222,7 +171,7 @@ export function QuickActions({ initialActionId }: { initialActionId: string | nu
     );
   }
 
-  const Icon = ICONS[active.icon] ?? Sparkles;
+  const Icon = QUICK_ACTION_ICONS[active.icon] ?? Sparkles;
   const missing = missingInputs(active, values);
 
   async function go() {
