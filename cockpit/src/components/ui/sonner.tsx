@@ -11,6 +11,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
+      // Top-right so toasts never sit on top of the bottom-right help-wizard
+      // bubble (they collided at bottom-right). Overridable via props below.
+      position="top-right"
       className="toaster group"
       toastOptions={{
         classNames: {
