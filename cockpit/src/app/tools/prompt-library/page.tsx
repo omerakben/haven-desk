@@ -8,9 +8,9 @@ export const dynamic = "force-dynamic";
 export default async function PromptLibraryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; new?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q, new: newParam } = await searchParams;
   const [promptRows, templateRows] = await Promise.all([
     prisma.prompt
       .findMany({
@@ -44,5 +44,12 @@ export default async function PromptLibraryPage({
     builtin: t.builtin,
   }));
 
-  return <PromptLibrary prompts={prompts} templates={templates} initialQuery={q ?? ""} />;
+  return (
+    <PromptLibrary
+      prompts={prompts}
+      templates={templates}
+      initialQuery={q ?? ""}
+      initialNewTemplate={newParam === "template"}
+    />
+  );
 }

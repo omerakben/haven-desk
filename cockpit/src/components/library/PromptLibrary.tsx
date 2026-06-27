@@ -65,11 +65,14 @@ export function PromptLibrary({
   prompts,
   templates,
   initialQuery = "",
+  initialNewTemplate = false,
 }: {
   prompts: LibPrompt[];
   templates: LibTemplate[];
   /** Seed for the search box (the ⌘K search deep link: /tools/prompt-library?q=…). */
   initialQuery?: string;
+  /** Open the New-template dialog on the Templates tab (deep link from /tools/templates?new=template). */
+  initialNewTemplate?: boolean;
 }) {
   const router = useRouter();
   const [q, setQ] = useState(initialQuery);
@@ -84,6 +87,13 @@ export function PromptLibrary({
   const [editing, setEditing] = useState<LibPrompt | null>(null);
   const [useTemplate, setUseTemplate] = useState<LibTemplate | null>(null);
   const [tmplSeed, setTmplSeed] = useState<TemplateSeed | null>(null);
+
+  // Deep link from /tools/templates ("+ New template"): open the New-template dialog.
+  useEffect(() => {
+    if (!initialNewTemplate) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven deep-link consume
+    setTmplSeed({ name: "", description: "", category: "", body: "", variables: "" });
+  }, [initialNewTemplate]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -185,7 +195,7 @@ export function PromptLibrary({
         Saved prompts and reusable variable templates.
       </p>
 
-      <Tabs defaultValue="prompts" className="mt-6">
+      <Tabs defaultValue={initialNewTemplate ? "templates" : "prompts"} className="mt-6">
         <TabsList>
           <TabsTrigger value="prompts">Saved prompts ({prompts.length})</TabsTrigger>
           <TabsTrigger value="templates">Templates ({templates.length})</TabsTrigger>

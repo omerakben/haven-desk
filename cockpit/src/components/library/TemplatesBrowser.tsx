@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Play, Package } from "lucide-react";
+import { Search, Play, Package, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,9 +65,23 @@ export function TemplatesBrowser({ templates, initialRunId }: { templates: Brows
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-2xl font-semibold tracking-tight">Templates</h1>
+      <div className="flex items-start justify-between gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight">Templates</h1>
+        <Button asChild size="sm" variant="outline" className="shrink-0">
+          <Link href="/tools/prompt-library?new=template">
+            <Plus className="mr-1 h-4 w-4" /> New template
+          </Link>
+        </Button>
+      </div>
       <p className="mt-1.5 text-[15px] text-muted-foreground">
-        Pick a ready-made template, fill the blanks, and run it. Manage or create your own in the Prompt Library.
+        Pick a ready-made template, fill the blanks, and run it. Manage or create your own in the{" "}
+        <Link
+          href="/tools/prompt-library"
+          className="font-medium text-foreground underline underline-offset-2 hover:text-primary"
+        >
+          Prompt Library
+        </Link>
+        .
       </p>
 
       <div className="relative mt-5">
