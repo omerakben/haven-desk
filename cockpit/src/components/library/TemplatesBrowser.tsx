@@ -3,11 +3,13 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Play, Package, Plus, Pencil, Copy } from "lucide-react";
+import { Search, Play, Package, Plus, Pencil, Copy, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { TemplateRunDialog } from "@/components/library/TemplateRunDialog";
 import { groupTemplates } from "@/lib/templateGroups";
 
@@ -30,6 +32,26 @@ export function TemplatesBrowser({ templates, initialRunId }: { templates: Brows
   const [running, setRunning] = useState<BrowseTemplate | null>(
     () => (initialRunId ? templates.find((x) => x.id === initialRunId) ?? null : null),
   );
+  const [deleting, setDeleting] = useState<BrowseTemplate | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  // In-place delete: confirm, DELETE, then refresh the server-rendered list. Only
+  // offered on custom templates (built-ins are read-only — they get "Customize").
+  async function deleteTemplate(t: BrowseTemplate) {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/templates/${t.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Delete failed");
+      toast.success("Template deleted");
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Delete failed");
+    } finally {
+      setBusy(false);
+      setDeleting(null);
+    }
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -138,6 +160,19 @@ export function TemplatesBrowser({ templates, initialRunId }: { templates: Brows
                             </Link>
                           )}
                         </Button>
+                        {!t.builtin && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="ml-auto h-7 w-7 px-0 text-muted-foreground hover:text-destructive"
+                            aria-label={`Delete ${t.name}`}
+                            title="Delete"
+                            disabled={busy}
+                            onClick={() => setDeleting(t)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -159,6 +194,15 @@ export function TemplatesBrowser({ templates, initialRunId }: { templates: Brows
           if (initialRunId) router.replace("/tools/templates", { scroll: false });
         }}
         savedLabel="Saved to library"
+      />
+
+      <ConfirmDialog
+        open={deleting !== null}
+        onOpenChange={(o) => !o && setDeleting(null)}
+        title="Delete this template?"
+        description={deleting ? `“${deleting.name}” will be removed. This can’t be undone.` : ""}
+        confirmLabel="Delete"
+        onConfirm={() => deleting && deleteTemplate(deleting)}
       />
     </div>
   );
