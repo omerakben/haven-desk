@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { AiOutput } from "@/components/tools/AiOutput";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { StarterChips } from "@/components/StarterChips";
+import { ResultSaveActions } from "@/components/tools/ResultSaveActions";
 import {
   QUICK_ACTIONS,
   QUICK_ACTION_CATEGORIES,
@@ -317,20 +318,23 @@ export function QuickActions({ initialActionId }: { initialActionId: string | nu
       <AiOutput output={output} status={status} label="Result" />
 
       {status === "done" && output && (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">Make it:</span>
-          {REFINE_OPTIONS.map((r) => (
-            <button
-              key={r.id}
-              type="button"
-              onClick={() => refineWith(r.instruction)}
-              disabled={isRunning}
-              className="rounded-full border border-border px-2.5 py-1 text-xs transition-colors hover:border-primary/40 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 disabled:opacity-60"
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Make it:</span>
+            {REFINE_OPTIONS.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => refineWith(r.instruction)}
+                disabled={isRunning}
+                className="rounded-full border border-border px-2.5 py-1 text-xs transition-colors hover:border-primary/40 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 disabled:opacity-60"
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+          <ResultSaveActions text={output} action={active} />
+        </>
       )}
     </div>
   );
