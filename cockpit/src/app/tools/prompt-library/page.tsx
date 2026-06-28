@@ -11,7 +11,7 @@ export default async function PromptLibraryPage({
   searchParams: Promise<{ q?: string; new?: string; edit?: string; duplicate?: string }>;
 }) {
   const { q, new: newParam, edit, duplicate } = await searchParams;
-  const [promptRows, templateRows] = await Promise.all([
+  const [promptRows, templateRows, projectRows] = await Promise.all([
     prisma.prompt
       .findMany({
         orderBy: [{ favorite: "desc" }, { createdAt: "desc" }],
@@ -20,6 +20,9 @@ export default async function PromptLibraryPage({
       .catch(() => []),
     prisma.template
       .findMany({ where: PROMPT_TEMPLATE_WHERE, orderBy: { name: "asc" } })
+      .catch(() => []),
+    prisma.project
+      .findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
       .catch(() => []),
   ]);
 
@@ -31,6 +34,7 @@ export default async function PromptLibraryPage({
     tags: p.tags,
     favorite: p.favorite,
     source: p.source,
+    projectId: p.projectId,
     project: p.project?.name ?? null,
   }));
 
@@ -48,6 +52,7 @@ export default async function PromptLibraryPage({
     <PromptLibrary
       prompts={prompts}
       templates={templates}
+      projects={projectRows}
       initialQuery={q ?? ""}
       initialNewTemplate={newParam === "template"}
       initialEditId={edit ?? null}
