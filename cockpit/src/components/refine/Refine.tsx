@@ -82,8 +82,10 @@ export function Refine() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages]);
+    // Pin to the latest line. During streaming use an instant scroll — a smooth
+    // scroll restarts its animation on every token and visibly stutters.
+    bottomRef.current?.scrollIntoView({ behavior: streaming ? "auto" : "smooth", block: "end" });
+  }, [messages, streaming]);
 
   const started = messages.length > 0;
 
@@ -146,7 +148,7 @@ export function Refine() {
         <div className="space-y-4 rounded-xl border border-border bg-card/40 p-4">
           {messages.map((m, i) =>
             m.role === "user" ? (
-              <div key={i} className="ml-auto max-w-[85%] rounded-lg bg-primary/10 px-3 py-2 text-sm">
+              <div className="ml-auto max-w-[85%] whitespace-pre-wrap break-words rounded-lg bg-primary/10 px-3 py-2 text-sm" key={i}>
                 {m.content}
               </div>
             ) : (
