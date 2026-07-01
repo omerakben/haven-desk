@@ -116,7 +116,10 @@ export function buildBriefInput(idea: string, answers: InterviewAnswer[]): strin
       question: typeof a.question === "string" ? a.question.trim() : "",
       type: typeof a.type === "string" ? a.type : "",
       answer: typeof a.answer === "string" ? a.answer.trim() : "",
-    }));
+    }))
+    // Drop entries with no question text — a malformed payload would otherwise
+    // produce a broken line like "- (scope) \n  -> answer".
+    .filter((a) => a.question !== "");
 
   const answered = norm.filter((a) => a.answer);
   if (answered.length > 0) {

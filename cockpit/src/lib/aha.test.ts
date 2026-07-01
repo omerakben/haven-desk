@@ -110,4 +110,15 @@ describe("buildBriefInput", () => {
     expect(() => buildBriefInput("idea", junk)).not.toThrow();
     expect(buildBriefInput("idea", junk)).toContain("IDEA:\nidea");
   });
+
+  it("drops entries with an empty question so no broken line is emitted", () => {
+    const mixed: InterviewAnswer[] = [
+      { question: "", type: "scope", answer: "orphan answer" },
+      { question: "Real question?", type: "risk", answer: "yes" },
+    ];
+    const out = buildBriefInput("idea", mixed);
+    expect(out).toContain("Real question?");
+    expect(out).not.toContain("orphan answer");
+    expect(out).not.toMatch(/-\s*\(scope\)\s*\n/); // no "- (scope) \n" broken line
+  });
 });
