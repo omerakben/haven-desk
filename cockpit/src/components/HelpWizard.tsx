@@ -8,12 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/Markdown";
 import { useWizardChat } from "@/hooks/useWizardChat";
 import { suggestTools } from "@/lib/wizard";
-
-const STARTERS = [
-  "What can Haven Desk do?",
-  "How do I turn meeting notes into tasks?",
-  "Which tool writes an email?",
-];
+import { StarterChips } from "@/components/StarterChips";
+import { WIZARD_TARGET, INBOX_FIELD, builtinStartersFor } from "@/lib/quickActions";
 
 // "Open ___" chips below an answer. suggestTools only ever returns real nav
 // items, so a hallucinated tool name in the prose can never produce a chip.
@@ -90,16 +86,14 @@ export function HelpWizard() {
             {messages.length === 0 ? (
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">Hi! I can explain any tool and point you to it. Try:</p>
-                {STARTERS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => submit(s)}
-                    className="block w-full rounded-lg border border-border px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 hover:bg-accent/60"
-                  >
-                    {s}
-                  </button>
-                ))}
+                <StarterChips
+                  target={WIZARD_TARGET}
+                  fallback={builtinStartersFor(WIZARD_TARGET)}
+                  current={{ [INBOX_FIELD]: input }}
+                  onPick={(inputs) => submit(inputs[INBOX_FIELD] ?? "")}
+                  editFields={[{ name: INBOX_FIELD, label: "Question", type: "textarea" }]}
+                  headline="Ask about any tool:"
+                />
               </div>
             ) : (
               messages.map((m, i) =>

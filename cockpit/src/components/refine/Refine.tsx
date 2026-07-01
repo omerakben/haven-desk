@@ -8,18 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Markdown } from "@/components/Markdown";
 import { ExtractTasksButton } from "@/components/tools/ExtractTasksButton";
+import { StarterChips } from "@/components/StarterChips";
 import { useRefineChat } from "@/hooks/useRefineChat";
 import { REFINE_MODES, DEFAULT_MODE, type RefineModeId } from "@/lib/refine";
+import { REFINE_TARGET, INBOX_FIELD, builtinStartersFor } from "@/lib/quickActions";
 import { deriveNoteTitle } from "@/lib/resultTitle";
 import { cn } from "@/lib/utils";
-
-// A few editable-in-your-head example ideas to prime an empty box. Kept inline
-// and deliberately fuzzy — the point of Refine is to sharpen a vague thought.
-const EXAMPLES = [
-  "A weekly newsletter for my bakery's regulars",
-  "An app that reminds me to call my parents",
-  "Reorganizing my team's Monday standup",
-];
 
 // Clicking a lens mid-discussion sends this as the next turn, so switching lens
 // is one click that does something — the AHA pipeline (ask → align → critique →
@@ -167,23 +161,16 @@ export function Refine() {
         </div>
       )}
 
-      {/* Empty-state examples */}
+      {/* Empty-state examples — editable starters (create/edit/delete/reset). */}
       {!started && (
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Not sure where to start? Try one of these:</p>
-          <div className="flex flex-wrap gap-2">
-            {EXAMPLES.map((ex) => (
-              <button
-                key={ex}
-                type="button"
-                onClick={() => setInput(ex)}
-                className="rounded-full border border-primary/45 bg-primary/10 px-3 py-1 text-sm text-foreground transition-colors hover:bg-primary/15"
-              >
-                {ex}
-              </button>
-            ))}
-          </div>
-        </div>
+        <StarterChips
+          target={REFINE_TARGET}
+          fallback={builtinStartersFor(REFINE_TARGET)}
+          current={{ [INBOX_FIELD]: input }}
+          onPick={(inputs) => setInput(inputs[INBOX_FIELD] ?? "")}
+          editFields={[{ name: INBOX_FIELD, label: "Idea", type: "textarea" }]}
+          headline="Not sure where to start? Tap one:"
+        />
       )}
 
       {/* Composer */}

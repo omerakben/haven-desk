@@ -29,10 +29,24 @@ export const IMAGE_TARGET = "image";
 // and the pasted notes) — killing the last blank-box openings.
 export const EMAIL_TARGET = "email";
 export const MEETING_TARGET = "meeting-notes";
+// Refine (the idea you talk through), the Help Wizard (the question you ask), and
+// the Projects empty state (a project name) are single-text starter targets too —
+// so every "Not sure where to start?" example in the app is user-editable.
+export const REFINE_TARGET = "refine";
+export const WIZARD_TARGET = "wizard";
+export const PROJECTS_TARGET = "projects";
 // The single text field shared by the single-text starter targets above.
 export const INBOX_FIELD = "text";
 // The single-text (no action schema) starter targets.
-export const TEXT_STARTER_TARGETS = [INBOX_TARGET, IMAGE_TARGET, EMAIL_TARGET, MEETING_TARGET];
+export const TEXT_STARTER_TARGETS = [
+  INBOX_TARGET,
+  IMAGE_TARGET,
+  EMAIL_TARGET,
+  MEETING_TARGET,
+  REFINE_TARGET,
+  WIZARD_TARGET,
+  PROJECTS_TARGET,
+];
 
 // A built-in starter: the seed source for the editable Starter rows (lib/starters.ts).
 // `key` is the stable sourceKey; `target` is a QuickAction id or INBOX_TARGET.
@@ -458,6 +472,32 @@ export const BUILTIN_STARTERS: BuiltinStarter[] = [
   // Meeting Notes starters — fill the notes box.
   { target: MEETING_TARGET, key: "meeting:rough", label: "Rough meeting notes",
     inputs: { [INBOX_FIELD]: "Standup: Sam to send the client quote by Friday. Dana finishing the logo, needs feedback by Wed. Book the venue for the 12th. Order more business cards. Follow up with the printer about the proofs." } },
+
+  // Refine — fuzzy ideas to talk through (the chip label IS the idea).
+  { target: REFINE_TARGET, key: "refine:newsletter", label: "A weekly newsletter for my bakery's regulars",
+    inputs: { [INBOX_FIELD]: "A weekly newsletter for my bakery's regulars" } },
+  { target: REFINE_TARGET, key: "refine:reminder-app", label: "An app that reminds me to call my parents",
+    inputs: { [INBOX_FIELD]: "An app that reminds me to call my parents" } },
+  { target: REFINE_TARGET, key: "refine:standup", label: "Reorganizing my team's Monday standup",
+    inputs: { [INBOX_FIELD]: "Reorganizing my team's Monday standup" } },
+
+  // Help Wizard — starter questions (the chip label IS the question).
+  { target: WIZARD_TARGET, key: "wizard:what-can-it-do", label: "What can Haven Desk do?",
+    inputs: { [INBOX_FIELD]: "What can Haven Desk do?" } },
+  { target: WIZARD_TARGET, key: "wizard:notes-to-tasks", label: "How do I turn meeting notes into tasks?",
+    inputs: { [INBOX_FIELD]: "How do I turn meeting notes into tasks?" } },
+  { target: WIZARD_TARGET, key: "wizard:which-email", label: "Which tool writes an email?",
+    inputs: { [INBOX_FIELD]: "Which tool writes an email?" } },
+
+  // Projects — example project names for the empty state (the chip label IS the name).
+  { target: PROJECTS_TARGET, key: "projects:acme-bakery", label: "Acme Bakery",
+    inputs: { [INBOX_FIELD]: "Acme Bakery" } },
+  { target: PROJECTS_TARGET, key: "projects:side-hustle", label: "Side hustle",
+    inputs: { [INBOX_FIELD]: "Side hustle" } },
+  { target: PROJECTS_TARGET, key: "projects:home-reno", label: "Home renovation",
+    inputs: { [INBOX_FIELD]: "Home renovation" } },
+  { target: PROJECTS_TARGET, key: "projects:q3-marketing", label: "Q3 marketing",
+    inputs: { [INBOX_FIELD]: "Q3 marketing" } },
 ];
 
 // Group the action-targeted built-ins into the per-action example shape the

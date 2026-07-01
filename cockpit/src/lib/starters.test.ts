@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { BUILTIN_STARTERS, INBOX_TARGET, IMAGE_TARGET, EMAIL_TARGET, MEETING_TARGET, INBOX_FIELD } from "./quickActions";
+import {
+  BUILTIN_STARTERS,
+  INBOX_TARGET,
+  IMAGE_TARGET,
+  EMAIL_TARGET,
+  MEETING_TARGET,
+  REFINE_TARGET,
+  WIZARD_TARGET,
+  PROJECTS_TARGET,
+  INBOX_FIELD,
+} from "./quickActions";
 import { buildStarterSeedPlan, parseInputs, validateStarter } from "./starters";
 
 describe("starters", () => {
@@ -36,8 +46,8 @@ describe("starters", () => {
     expect(validateStarter(INBOX_TARGET, "X", { [INBOX_FIELD]: "a note" }).ok).toBe(true);
   });
 
-  it("validateStarter treats image/email/meeting starters like inbox (non-empty text)", () => {
-    for (const target of [IMAGE_TARGET, EMAIL_TARGET, MEETING_TARGET]) {
+  it("validateStarter treats every single-text target like inbox (non-empty text)", () => {
+    for (const target of [IMAGE_TARGET, EMAIL_TARGET, MEETING_TARGET, REFINE_TARGET, WIZARD_TARGET, PROJECTS_TARGET]) {
       expect(validateStarter(target, "X", { [INBOX_FIELD]: "" }).ok, `${target} empty`).toBe(false);
       expect(validateStarter(target, "X", { [INBOX_FIELD]: "some text" }).ok, `${target} filled`).toBe(true);
     }

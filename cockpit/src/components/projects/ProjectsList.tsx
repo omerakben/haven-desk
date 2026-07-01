@@ -9,10 +9,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Relatable starter names across personas (small business / individual / home /
-// professional) so a first-timer sees what a "project" is for, not a blank box.
-const EXAMPLE_PROJECTS = ["Acme Bakery", "Side hustle", "Home renovation", "Q3 marketing"];
+import { StarterChips } from "@/components/StarterChips";
+import { PROJECTS_TARGET, INBOX_FIELD, builtinStartersFor } from "@/lib/quickActions";
 
 export type ProjectCounts = {
   prompts: number;
@@ -84,19 +82,14 @@ export function ProjectsList({ projects }: { projects: ProjectRow[] }) {
             space. Create a project when you want to keep a client, a side hustle, or a big effort
             on its own — with its own tasks, notes, drafts, and memory.
           </p>
-          <p className="mt-3 text-xs font-medium text-muted-foreground">Start with an example:</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {EXAMPLE_PROJECTS.map((ex) => (
-              <button
-                key={ex}
-                type="button"
-                onClick={() => fillExample(ex)}
-                className="rounded-full border border-border px-3 py-1 text-sm transition-colors hover:border-primary/40 hover:bg-accent/60"
-              >
-                {ex}
-              </button>
-            ))}
-          </div>
+          <StarterChips
+            target={PROJECTS_TARGET}
+            fallback={builtinStartersFor(PROJECTS_TARGET)}
+            current={{ [INBOX_FIELD]: name }}
+            onPick={(inputs) => fillExample(inputs[INBOX_FIELD] ?? "")}
+            editFields={[{ name: INBOX_FIELD, label: "Project name" }]}
+            headline="Start with an example:"
+          />
         </div>
       ) : (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
