@@ -82,7 +82,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/tools/templates", label: "Templates", icon: LayoutTemplate, group: "write", desc: "Browse & run ready-made templates.", keywords: "template proposal sop email pack run library" },
   { href: "/tools/prompt-library", label: "Prompt Library", icon: Library, group: "write", desc: "Saved prompts; manage your templates.", keywords: "templates prompts saved" },
   { href: "/tools/email-writer", label: "Email Writer", icon: Mail, group: "write", desc: "Compose and reply with the right tone.", keywords: "compose reply" },
-  { href: "/tools/brainstorm", label: "Brainstorming", icon: Lightbulb, group: "write", desc: "Structured thinking techniques.", keywords: "ideas techniques" },
+  { href: "/tools/brainstorm", label: "Brainstorming", icon: Lightbulb, group: "write", desc: "Refine an idea, or run a thinking technique.", keywords: "ideas techniques refine interview me ask questions aha product manager edge cases premortem" },
 
   // Documents — saved text lives here (the Idea store: results, brainstorms,
   // captures, quick notes). Was reserved/empty until now.

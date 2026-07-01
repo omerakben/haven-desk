@@ -66,6 +66,8 @@ test.describe("phase 2 tools", () => {
   test("brainstorm shows the technique picker", async ({ page }) => {
     await page.goto("/tools/brainstorm");
     await expect(page.getByRole("heading", { name: /brainstorming/i })).toBeVisible();
+    // "Refine an idea" is the default mode now; the classic techniques sit behind a tab.
+    await page.getByRole("tab", { name: "Thinking techniques" }).click();
     await expect(page.getByRole("button", { name: /premortem/i })).toBeVisible();
   });
 
